@@ -3,7 +3,7 @@
  *  Implements various led pulses.
  *
  *  Date: April 4, 2018
- *  Authors: Zach Bunce, Garret Maxon
+ *  Authors: Zach Bunce, Garrett Maxon
  */
 //Toggles BIT0
 //Indefinitely counts to 2k & then flips BIT0
@@ -45,8 +45,8 @@ void delay_us(int, int);
 
 int main(void)
 {
-    int t = 1000000;
-    int f = F_3_MeHz;
+    int t = 100;
+    int f = F_6_MeHz;
 
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;    // Stop WDT
 
@@ -69,14 +69,14 @@ int main(void)
 void delay_ms(int time_ms, int freq_MeHz)
 {
     int i;
-    int j;
-    int z;
+    unsigned int j;
     //Unit Conversion: MeHz * ms = 10^5 * 10^-3 = 10^2 = 100
-    int freq_cnv = freq_MeHz * 100;         //Multiplies in unit conversion to stable variable
-    for (i = time_ms; i > 0; i--) {         //Wait the amount of ms specified
-        for (j = freq_cnv; j > 0; j--) {    //Wait the amount of MeHz of the system clk for each ms
-            z++; //Nom
-        }
+    int time_fix = time_ms / 10;
+    unsigned int freq_cnv = freq_MeHz * 100;         //Multiplies in unit conversion to stable variable
+    for (i = time_fix; i > 0; i--) {         //Wait the amount of ms specified
+        for (j = freq_cnv; j > 0; j--);// {    //Wait the amount of MeHz of the system clk for each ms
+            //z++; //Nom
+        //}
     }
 }
 
@@ -84,10 +84,11 @@ void delay_ms(int time_ms, int freq_MeHz)
 void delay_us(int time_us, int freq_MeHz)
 {
     int i;
-    int j;
+    unsigned int j;
     //Unit Conversion: MeHz * us = 10^5 * 10^-6 = 10^-1 = 0.1; Accounted for in decrement
-    for (i = time_us; i > 0; i--)  {            //Wait the amount of us specified
-        for (j = freq_MeHz; j > 0; j = j - 10); //Wait the amount of MeHz of the system clk for each us
+    int time_fix = time_us / 11;
+    for (i = time_fix; i > 0; i--)  {            //Wait the amount of us specified
+        for (j = freq_MeHz; j > 0; j -= 10); //Wait the amount of MeHz of the system clk for each us
     }
 }
 
@@ -100,21 +101,30 @@ void set_DCO(int freq)
     {
     case F_1p5_MeHz:
         CS->CTL0 = CS_CTL0_DCORSEL_0;                       //Sets DC0 to 1.5 MHz
+        CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3; //Sets the clock references
+        break;
     case F_3_MeHz:
         CS->CTL0 = CS_CTL0_DCORSEL_1;                       //Sets DC0 to 3 MHz
+        CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3; //Sets the clock references
+        break;
     case F_6_MeHz:
         CS->CTL0 = CS_CTL0_DCORSEL_2;                       //Sets DC0 to 6 MHz
+        CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3; //Sets the clock references
+        break;
     case F_12_MeHz:
         CS->CTL0 = CS_CTL0_DCORSEL_3;                       //Sets DC0 to 12 MHz
+        CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3; //Sets the clock references
+        break;
     case F_24_MeHz:
         CS->CTL0 = CS_CTL0_DCORSEL_4;                       //Sets DC0 to 24 MHz
+        CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3; //Sets the clock references
+        break;
     case F_48_MeHz:
         // Transition to VCORE Level 1: AM0_LDO --> AM1_LDO
         while ((PCM->CTL1 & PCM_CTL1_PMR_BUSY))
             ;
         PCM->CTL0 = PCM_CTL0_KEY_VAL | PCM_CTL0_AMR_1;
-        while ((PCM->CTL1 & PCM_CTL1_PMR_BUSY))
-            ;
+        while ((PCM->CTL1 & PCM_CTL1_PMR_BUSY));
 
         // Configure Flash wait-state to 1 for both banks 0 & 1
         FLCTL->BANK0_RDCTL = (FLCTL->BANK0_RDCTL
@@ -125,11 +135,9 @@ void set_DCO(int freq)
         CS->CTL0 = CS_CTL0_DCORSEL_5;                       //Sets DC0 to 48 MHz
         CS->CTL1 = CS->CTL1
                 & ~(CS_CTL1_SELM_MASK | CS_CTL1_DIVM_MASK)| CS_CTL1_SELM_3; //Sets MCLK to DCO
-        CS->KEY = 0;                                        //Locks CS registers
         break;
     default:
-        CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3; //Sets the clock references
-        CS->KEY = 0;                                        //Locks CS registers
+        break;
     }
+    CS->KEY = 0;                                        //Locks CS registers
 }
-
