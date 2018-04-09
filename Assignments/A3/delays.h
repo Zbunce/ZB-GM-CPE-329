@@ -1,6 +1,8 @@
 /*
  *  delays.h
  *  Header file for both the ms and us delay functions.
+ *  delay_us only reliable above 55 us.
+ *  Delays under 30 us produce 2.5us delay.
  *
  *  Date: April 4, 2018
  *  Author: Zach Bunce, Garret Maxon

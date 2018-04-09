@@ -572,3 +572,16 @@ org.eclipse.core.runtime.OperationCanceledException
 	at org.eclipse.equinox.internal.p2.updatechecker.UpdateChecker.getAvailableRepositories(UpdateChecker.java:152)
 	at org.eclipse.equinox.internal.p2.updatechecker.UpdateChecker.checkForUpdates(UpdateChecker.java:130)
 	at org.eclipse.equinox.internal.p2.updatechecker.UpdateChecker$UpdateCheckThread.run(UpdateChecker.java:74)
+!SESSION 2018-04-09 11:28:19.839 -----------------------------------------------
+eclipse.buildId=4.7.1.M20171009-0410
+java.version=1.8.0_112
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=en_US
+Framework arguments:  -product com.ti.ccstudio.branding.product C:\Users\sirmo\OneDrive\Cal Poly Files\9. Spring 2018\CPE 329\ZB-GM-CPE-329\Assignments\A3\main.c
+Command-line arguments:  -os win32 -ws win32 -arch x86 -product com.ti.ccstudio.branding.product C:\Users\sirmo\OneDrive\Cal Poly Files\9. Spring 2018\CPE 329\ZB-GM-CPE-329\Assignments\A3\main.c
+
+!ENTRY com.ti.common.core 4 0 2018-04-09 11:28:24.728
+!MESSAGE path=ccs_base/DebugServer
+
+!ENTRY com.ti.common.core 4 0 2018-04-09 11:28:24.742
+!MESSAGE debugServerDir=C:/ti/ccsv8/ccs_base/DebugServer

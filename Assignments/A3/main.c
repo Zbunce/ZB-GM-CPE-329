@@ -25,35 +25,69 @@
 #define DB7         BIT7
 
 #define CLR_DISP    0x01
-#define FXN_SET     0x38 //8-Bit, 2 line, 5x8 font spec.
+#define FXN_SET     0x28
+#define HOME_RET    0x02
+//0x28 4-Bit, 2 line, 5x8 font, 0x388-Bit, 2 line, 5x8 font
 
-void main(void)
+void main()
 {
 	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
-	LCD_INIT();
+	delay_ms(20, CLK);
+    LCD_INIT();
 
     LCD_CMD(FXN_SET);
-    delay_us(37, SYS_FREQ);
+    delay_us(37, CLK); //Nominal 37us, but delay_us only reliable above 55us
+    LCD_CMD()
+}
+
+//Takes in DDRAM address pixel and ASCII character sym
+void write_char_LCD(unsigned char pixel, unsigned char sym, int CLK)
+{
+    unsigned char addr = 0x80 | sym;
+    LCD_CMD(addr, CLK);
+    delay_us(37, CLK);
+    
+    
+    LCD_CMD()
+}
+
+//1.52 ms delay required after operation
+void home_LCD(int CLK)
+{
+    LCD_CMD(HOME_RET);
+    delay_ms(2, CLK);
+}
+
+//1.52 ms delay required after operation
+void clear_LCD(int CLK)
+{
+    LCD_CMD(CLR_DISP);
+    delay_ms(2, CLK);
 }
 
 //Sets up I/O register direction
-void LCD_INIT(void)
+void LCD_INIT()
 {
     P3 -> DIR |= RS | RW | EN;
     P4 -> DIR = 0xFF; //Using all 8 bits in reg so we can be lazy
 }
 
-//Writes character to LCD
-void LCD_CMD(unsigned char CMD)
+//CTRL: Top three bits EN, RW, RS respectively
+void LCD_CTRL(unsigned int CTRL, int CLK)
 {
     P3 -> OUT &= ~(RS+RW+EN);
+    P3 -> OUT |= CTRL;
+    delay_us(100, CLK);
+}
+
+//Writes character to LCD
+void LCD_CMD(unsigned char CMD, int CLK)
+{
     P4 -> OUT = 0x00;
-    P3 -> OUT |= EN;
-    delay_us(100, SYS_FREQ);
     P4 -> OUT = CMD;
-    delay_us(10, SYS_FREQ);
+    delay_us(10, CLK);
     P3 -> OUT &= ~EN;
     P4 -> OUT = 0x00;
-    delay_us(1, SYS_FREQ);
+    delay_us(1, CLK);
 }
 
