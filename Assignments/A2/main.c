@@ -9,7 +9,7 @@
 //Indefinitely counts to 2k & then flips BIT0
 
 #include "msp.h"
-#include "delays.h"
+#include "delays_c.h"
 #include "set_DCO.h"
 
 #define F_1p5_MeHz  15      //Defines various frequency values in almost MHz (10^5)
@@ -20,8 +20,9 @@
 #define F_48_MeHz   480
 
 void set_DCO(int);
-void delay_ms(int, int);
-void delay_us(int, int);
+void delay_ms_c(int, int);
+void delays_ms(int, int);
+void delay_us_c(int, int);
 
 int main(void)
 {
@@ -32,14 +33,14 @@ int main(void)
     P1->SEL1 &= ~BIT0;              //Clear bit 0 of the P1->SEL1 register
 
     P1->DIR |= BIT0;                //P1.0 set as output
-    set_DCO(F_24_MeHz);        //Sets the DCO to 1.5 MHz
+    set_DCO(F_1p5_MeHz);        //Sets the DCO to 1.5 MHz
     //Creates three 1000 ms pulses using 1.5 MHz, 6 MHz, and 24 MHz
     while (1)                       //Continuous loop
     {
 
         P1->OUT |= BIT0;            //Turn on P1.0 LED
-        delay_us(30, F_24_MeHz); //Waits for 1000 ms
+        delay_ms_c(1, F_1p5_MeHz); //Waits for 1000 ms
         P1->OUT &= ~BIT0;            //Turn off P1.0 LED
-        delay_us(30, F_24_MeHz);  //Wait a half pulse
+        delay_ms_c(1, F_1p5_MeHz);  //Wait a half pulse
     }
 }
