@@ -9,6 +9,7 @@ CMD_SRCS += \
 ../msp432p401r.cmd 
 
 C_SRCS += \
+../LCD.c \
 ../delays.c \
 ../main.c \
 ../set_DCO.c \
@@ -16,6 +17,7 @@ C_SRCS += \
 ../system_msp432p401r.c 
 
 C_DEPS += \
+./LCD.d \
 ./delays.d \
 ./main.d \
 ./set_DCO.d \
@@ -23,6 +25,7 @@ C_DEPS += \
 ./system_msp432p401r.d 
 
 OBJS += \
+./LCD.obj \
 ./delays.obj \
 ./main.obj \
 ./set_DCO.obj \
@@ -30,6 +33,7 @@ OBJS += \
 ./system_msp432p401r.obj 
 
 OBJS__QUOTED += \
+"LCD.obj" \
 "delays.obj" \
 "main.obj" \
 "set_DCO.obj" \
@@ -37,6 +41,7 @@ OBJS__QUOTED += \
 "system_msp432p401r.obj" 
 
 C_DEPS__QUOTED += \
+"LCD.d" \
 "delays.d" \
 "main.d" \
 "set_DCO.d" \
@@ -44,6 +49,7 @@ C_DEPS__QUOTED += \
 "system_msp432p401r.d" 
 
 C_SRCS__QUOTED += \
+"../LCD.c" \
 "../delays.c" \
 "../main.c" \
 "../set_DCO.c" \
