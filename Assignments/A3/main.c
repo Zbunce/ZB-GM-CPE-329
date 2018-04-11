@@ -28,12 +28,12 @@ void main()
 
     set_DCO(CLK);
     LCD_INIT(CLK);
-    unsigned char letter  = 0x41;
+    unsigned char string[]  = "Hello";
     unsigned char addr    = 0x00;
 
     //Writes an "A" to the top left pixel, and then clears it.
     while(1) {
-        write_char_LCD(letter, addr, CLK);
+        write_string_LCD(string, addr, CLK);
         delay_ms(500, CLK);
         clear_LCD(CLK);
         delay_ms(500, CLK);
