@@ -49,6 +49,34 @@ void write_char_LCD(unsigned char sym, unsigned char pixel, int CLK)
     delay_us(37, CLK);
 }
 
+<<<<<<< HEAD
+=======
+void write_string_LCD(char string[] , unsigned char pixel, int CLK)
+{
+
+    len = strlen(string);
+    for(i = 0x00; i <= len; i++)
+    {
+        location = i+pixel;
+        if ((location > 0x0f) && (location < 0x40))
+        {
+            pixel = 0x40;
+            location = i+pixel;
+        }
+        else if (location > 0x4f)
+        {
+            pixel = 0x00;
+            location = i+pixel;
+        }
+
+        write_char_LCD(string[i], location, CLK);
+        delay_ms(200, CLK);
+        i++;
+    }
+
+}
+
+>>>>>>> dead
 //1.52 ms delay required after operation
 void home_LCD(int CLK)
 {
