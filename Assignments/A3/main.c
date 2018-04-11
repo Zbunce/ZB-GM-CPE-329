@@ -23,23 +23,15 @@ void home_LCD(int);
 
 void main()
 {
-<<<<<<< HEAD
-	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
-	int CLK = 480;
-
-	set_DCO(CLK);
-=======
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
     int CLK = 480;
 
     set_DCO(CLK);
->>>>>>> dead
     LCD_INIT(CLK);
     unsigned char letter  = 0x41;
     unsigned char addr    = 0x00;
 
     //Writes an "A" to the top left pixel, and then clears it.
-<<<<<<< HEAD
     while(1) {
         write_char_LCD(letter, addr, CLK);
         delay_ms(500, CLK);
@@ -47,15 +39,6 @@ void main()
         delay_ms(500, CLK);
     }
     /*//Writes consecutive characters through all pixels
-=======
-//    while(1) {
-//        write_char_LCD(letter, addr, CLK);
-//        delay_ms(500, CLK);
-//        clear_LCD(CLK);
-//        delay_ms(500, CLK);
-//    }
-    //Writes consecutive characters through all pixels
->>>>>>> dead
     //Then resets
     unsigned char i;
     while(1) {
@@ -73,9 +56,5 @@ void main()
             delay_ms(500, CLK);
             letter++;
         }
-<<<<<<< HEAD
     }*/
-=======
-    }
->>>>>>> dead
 }
