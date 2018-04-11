@@ -49,8 +49,7 @@ void write_char_LCD(unsigned char sym, unsigned char pixel, int CLK)
     delay_us(37, CLK);
 }
 
-<<<<<<< HEAD
-=======
+
 void write_string_LCD(char string[] , unsigned char pixel, int CLK)
 {
 
@@ -76,7 +75,6 @@ void write_string_LCD(char string[] , unsigned char pixel, int CLK)
 
 }
 
->>>>>>> dead
 //1.52 ms delay required after operation
 void home_LCD(int CLK)
 {
