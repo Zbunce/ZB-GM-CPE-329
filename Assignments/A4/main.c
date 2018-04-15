@@ -33,16 +33,16 @@ void main(void)
 	LCD_INIT(CLK);
 	KEYPAD_INIT();
 
-	uint8_t key = 1;
+	uint8_t key = 0x10;
 	uint8_t addr = 0x00;
 	while(1) {
-	    while(key == 1) {
+	    while(key == 0x10) {
 	        key = chk_Keypad();
 	    }
 
         write_char_LCD(key, addr, CLK);
         home_LCD(CLK);
         delay_ms(500,CLK);
-        key = 1;
+        key = 0x10;
     }
 }
