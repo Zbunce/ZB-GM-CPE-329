@@ -49,7 +49,7 @@ uint8_t chk_Keypad();
 uint8_t chk_Key();
 int chk_Password(int);
 void LCD_Locked(int);
-
+int LCD_Unlocked(int);
 
 void main(void)
 {
@@ -57,36 +57,52 @@ void main(void)
 
     int CLK = 480;
     int lock = LOCKED;
-    int i;
-    uint8_t addr;
     set_DCO(CLK);
     LCD_INIT(CLK);
     KEYPAD_INIT();
 
-    while(lock == LOCKED)
+    while(1)
     {
-        LCD_Locked(CLK);
-        lock = chk_Password(CLK);
+        delay_ms(200, CLK);
         clear_LCD(CLK);
-    }
+        while(lock == LOCKED)
+        {
+            LCD_Locked(CLK);
+            lock = chk_Password(CLK);
+            clear_LCD(CLK);
+        }
 
+        while(lock == UNLOCKED)
+        {
+            lock = LCD_Unlocked(CLK);
+
+        }
+
+    }
+}
+
+int LCD_Unlocked(int CLK)
+{
+    int i;
+    uint8_t key;
     char word[] = "HELLO WORLD";
-    uint8_t len;
-    while(lock == UNLOCKED)
-    {
-        len = strlen(word);
-        for(i = 0x00; i <= 0x4F; i++) {
-            write_char_LCD(K_NP, i-1, CLK);
-            write_string_LCD(word, i, CLK);
-            delay_ms(200, CLK);
-            if ((i > 0x0F) && (i < 0x40)) {
-                i = 0x40;
-            }
-            else if(i == 0x4F) {
-                i = 0x00;
-            }
+    for(i = 0x00; i <= 0x4F; i++) {
+        write_char_LCD(K_NP, i-1, CLK);
+        write_string_LCD(word, i, CLK);
+        delay_ms(200, CLK);
+        key = chk_Keypad();
+        if (key == K_Pnd) {
+            return LOCKED;
+        }
+        if ((i > 0x0F) && (i < 0x40)) {
+            i = 0x40;
+        }
+        else if(i == 0x4F) {
+            write_char_LCD(K_NP, i, CLK);
+            i = 0x00;
         }
     }
+    return UNLOCKED;
 }
 
 //

@@ -56,21 +56,20 @@ void write_char_LCD(uint8_t sym, uint8_t pixel, int CLK)
 void write_string_LCD(char word[], uint8_t pixel, int CLK)
 {
     uint8_t i;
-    uint8_t location;
+    uint8_t location = pixel;
     uint8_t len = strlen(word);
     for(i = 0; i < len; i++)
     {
-        location = i + pixel;
         if ((location > 0x0F) && (location < 0x40))
         {
-            pixel = 0x40;
+            location = 0x40;
         }
         else if (location > 0x4F)
         {
-            pixel = 0x00;
+            location = 0x00;
         }
-        location = i + pixel;
         write_char_LCD(word[i], location, CLK);
+        location++;
     }
 }
 
