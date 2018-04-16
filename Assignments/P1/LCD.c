@@ -10,6 +10,7 @@
 
 #include "msp.h"
 #include "delays.h"
+#include <string.h>
 
 #define RS          BIT5
 #define RW          BIT6
@@ -34,6 +35,7 @@
 
 void LCD_CMD(uint8_t, uint8_t, int);
 void LCD_CTRL(uint8_t, int);
+void write_char_LCD(uint8_t, uint8_t, int);
 
 //Takes in DDRAM address pixel and ASCII character sym
 //0x00...0x0F DDRAM Addresses
@@ -47,6 +49,28 @@ void write_char_LCD(uint8_t sym, uint8_t pixel, int CLK)
     CTRL = EN | RS;
     LCD_CMD(sym, CTRL, CLK);
     delay_us(37, CLK);
+}
+
+//Takes in DDRAM address pixel and ASCII string word
+//Word wraps if line ends are reached
+void write_string_LCD(char word[], uint8_t pixel, int CLK)
+{
+    uint8_t i;
+    uint8_t location = pixel;
+    uint8_t len = strlen(word);
+    for(i = 0; i < len; i++)
+    {
+        if ((location > 0x0F) && (location < 0x40))
+        {
+            location = 0x40;
+        }
+        else if (location > 0x4F)
+        {
+            location = 0x00;
+        }
+        write_char_LCD(word[i], location, CLK);
+        location++;
+    }
 }
 
 //1.52 ms delay required after operation

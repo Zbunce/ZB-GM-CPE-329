@@ -58,7 +58,7 @@
 #define K_0     0x30
 #define K_Pnd   0x23
 
-#define K_NP    0x01
+#define K_NP    0x10
 
 uint8_t KEY_LOCATE();
 
