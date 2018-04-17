@@ -10,32 +10,13 @@
 
 #include "msp.h"
 #include "delays.h"
+#include "LCD.h"
 #include <string.h>
-
-#define RS          BIT5
-#define RW          BIT6
-#define EN          BIT7
-
-#define DB0         BIT0
-#define DB1         BIT1
-#define DB2         BIT2
-#define DB3         BIT3
-#define DB4         BIT4
-#define DB5         BIT5
-#define DB6         BIT6
-#define DB7         BIT7
-
-#define DISP_CLR    0x01
-#define HOME_RET    0x02
-//Change the definitions below to change initialization
-#define DISP_SET    0x0F //0x0F Disp ON, Cursor ON, Blink ON
-#define FXN_SET     0x28 //0x28 4-Bit, 2 line, 5x8 font
-#define SHIFT_SET   0x10 //0x10 shifts cursor or disp
-#define ENTRY_SET   0x06 //0x06 -> cursor++
 
 void LCD_CMD(uint8_t, uint8_t, int);
 void LCD_CTRL(uint8_t, int);
 void write_char_LCD(uint8_t, uint8_t, int);
+void clear_LCD(int);
 
 //Takes in DDRAM address pixel and ASCII character sym
 //0x00...0x0F DDRAM Addresses
@@ -60,12 +41,10 @@ void write_string_LCD(char word[], uint8_t pixel, int CLK)
     uint8_t len = strlen(word);
     for(i = 0; i < len; i++)
     {
-        if ((location > 0x0F) && (location < 0x40))
-        {
+        if ((location > 0x0F) && (location < 0x40)) {
             location = 0x40;
         }
-        else if (location > 0x4F)
-        {
+        else if (location > 0x4F) {
             location = 0x00;
         }
         write_char_LCD(word[i], location, CLK);
@@ -85,6 +64,19 @@ void clear_LCD(int CLK)
 {
     LCD_CMD(DISP_CLR, EN, CLK);
     delay_ms(2, CLK);
+}
+
+void line_clear_LCD(int line, int CLK)
+{
+    char blank[] = "                ";
+    if (line == TOP) {
+        write_string_LCD(blank, 0x00, CLK);
+        home_LCD(CLK);
+    }
+    else if (line == BOTTOM) {
+        write_string_LCD(blank, 0x40, CLK);
+        write_char_LCD(0x10, 0x3F, CLK);
+    }
 }
 
 //Sets up I/O register direction

@@ -22,8 +22,8 @@ void set_DCO(int freq)
     switch (freq)
     {
     case F_1p5_MeHz:
-        CS->CTL0 = CS_CTL0_DCORSEL_0;                       //Sets DC0 to 1.5 MHz
-        CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3; //Sets the clock references
+        CS->CTL0 = CS_CTL0_DCORSEL_0;                       			//Sets DC0 to 1.5 MHz
+        CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3; 	//Sets the clock refs
         break;
     case F_3_MeHz:
         CS->CTL0 = CS_CTL0_DCORSEL_1;                       //Sets DC0 to 3 MHz

@@ -2,7 +2,7 @@
  * LCD.h
  * Header file for LCD control.
  *
- * Created on: April 10, 2018
+ * Date: April 10, 2018
  * Author: Zach Bunce, Garrett Maxon
  */
 

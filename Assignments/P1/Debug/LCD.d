@@ -20,6 +20,7 @@ LCD.obj: ../delays.h
 LCD.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h
 LCD.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/_ti_config.h
 LCD.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/linkage.h
+LCD.obj: ../LCD.h
 
 ../LCD.c: 
 C:/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -41,3 +42,4 @@ C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h:
 C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h: 
 C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/_ti_config.h: 
 C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/linkage.h: 
+../LCD.h: 

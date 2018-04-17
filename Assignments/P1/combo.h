@@ -1,7 +1,8 @@
 /*
  * combo.h
+ * Holds the passcode for the LCD lock
  *
- * Date: Apr 14, 2018
+ * Date: April 14, 2018
  * Author: Zach Bunce, Garrett Maxon
  */
 
