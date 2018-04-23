@@ -66,6 +66,7 @@ void clear_LCD(int CLK)
     delay_ms(2, CLK);
 }
 
+//Clears the specified line of the LCD and puts the cursor on the next line
 void line_clear_LCD(int line, int CLK)
 {
     char blank[] = "                ";

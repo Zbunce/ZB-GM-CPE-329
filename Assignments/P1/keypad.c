@@ -16,10 +16,10 @@ uint8_t KEY_LOCATE();
 //Sets P4.0-4.3 as rows and P5.0-5.2 as columns
 void KEYPAD_INIT()
 {
-    P4 -> DIR |= (ROWA | ROWB | ROWC | ROWD); //Sets DIR reg of the outputs
-    P5 -> DIR &= ~(COL1 | COL2 | COL3);     //Clears DIR reg of the inputs
-    P5 -> REN |=  (COL1 | COL2 | COL3);     //Enables PU or PD resistor
-    P5 -> OUT |=  (COL1 | COL2 | COL3);     //Confusing syntax, but PU or PD is set through PxOUT reg
+    P4 -> DIR |= (ROWA | ROWB | ROWC | ROWD);   //Sets DIR reg of the outputs
+    P5 -> DIR &= ~(COL1 | COL2 | COL3);         //Clears DIR reg of the inputs
+    P5 -> REN |=  (COL1 | COL2 | COL3);         //Enables PU or PD resistor
+    P5 -> OUT |=  (COL1 | COL2 | COL3);         //PU or PD is set through PxOUT reg
 }
 
 //Decodes row & column of key pressed into ASCII value

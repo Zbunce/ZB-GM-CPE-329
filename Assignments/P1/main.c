@@ -1,8 +1,12 @@
 /**
  * main.c
  *
- * Links the keypad to the LCD, displaying key pressed
- * Consecutive key presses overwrite previous entry
+ * Locks the LCD until the correct sequence of keys is pressed
+ * Once the correct sequence is pressed, displays "HELLO WORLD" unlock message
+ * Allows for the previously entered keys to be cleared with "*"
+ * Contains a privacy mode in which key presses are not printed
+ * Privacy mode is both entered and exited with "#*"
+ * Clearing is also enabled while in privacy mode
  *
  * Date: April 13 2018
  * Authors: Zach Bunce, Garrett Maxon
@@ -18,11 +22,11 @@
 #define LOCKED      1
 #define UNLOCKED    0
 
-//Operating mode indicators
-#define NORMAL      1
-#define PRIVATE     3
-#define PRIVLOCK    0xFE
-#define CLEAR       7
+//Mode indicator values
+#define NORMAL      1       //NORMAL = Non-Private LOCKED
+#define PRIVATE     3       //Privacy enter/exit
+#define PRIVLOCK    0xFE    //~LOCKED
+#define CLEAR       7       //Entry Clear
 
 void delay_ms(int, int);
 void set_DCO(int);
@@ -42,80 +46,57 @@ int chk_Privacy(uint8_t, uint8_t);
 
 void main(void)
 {
-    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
+    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD; //Stop watchdog timer
 
-    int CLK = 480;
-    uint8_t lock = LOCKED;
-    set_DCO(CLK);
-    LCD_INIT(CLK);
-    KEYPAD_INIT();
+    int CLK = 480;                              //48 MHz
+    uint8_t lock = LOCKED;                      //Locks the display
+    set_DCO(CLK);                               //Sets clock to 48MHz
+    LCD_INIT(CLK);                              //Initializes LCD
+    KEYPAD_INIT();                              //Initializes keypad
 
-    LCD_Locked(CLK);
+    LCD_Locked(CLK);                            //Sets up the lock screen
 
     while(1)
     {
         while((lock == LOCKED) || (lock == PRIVLOCK))
         {
-            line_clear_LCD(BOTTOM, CLK);
-            lock = chk_Password(lock, CLK);
-            line_clear_LCD(BOTTOM, CLK);
+            line_clear_LCD(BOTTOM, CLK);    //Clears the password entry line
+            lock = chk_Password(lock, CLK); //Checks the next 4 key presses
+            line_clear_LCD(BOTTOM, CLK);    //Clears the password entry line
         }
 
         while(lock == UNLOCKED)
         {
-            lock = LCD_Unlocked(CLK);
-            delay_ms(200, CLK);
+            lock = LCD_Unlocked(CLK);       //Scrolls the unlock message and waits for lock
+            delay_ms(200, CLK);             //Waits to avoid holding key press
         }
 
     }
 }
 
+//Checks to see if an alternate modes were activated
+//This includes privacy enter, privacy exit, and entry clear
 int chk_Mode(uint8_t prevKey, uint8_t curKey, uint8_t mode, int CLK)
 {
     if (curKey == K_Ast) {
         if (prevKey == K_Pnd) {
+            //Checks to see if privacy mode is already enabled
             if (mode == PRIVLOCK) {
                 clear_LCD(CLK);
-                LCD_Locked(CLK);
+                LCD_Locked(CLK);                            //Leaves privacy mode
                 return PRIVATE;
             }
             else {
                 clear_LCD(CLK);
-                write_string_LCD("PRIVATE MODE", 0, CLK);
+                write_string_LCD("PRIVATE MODE", 0, CLK);   //Enters privacy mode
                 return PRIVATE;
             }
 
         }
-
-        line_clear_LCD(BOTTOM, CLK);
+        line_clear_LCD(BOTTOM, CLK);                        //Clears previous entries
         return CLEAR;
     }
     return NORMAL;
-}
-
-int LCD_Unlocked(int CLK)
-{
-    int i;
-    uint8_t key;
-    char word[] = "HELLO WORLD";
-    for(i = 0x4F; i >= 0x00; i--) {
-        clear_LCD(CLK);
-        write_string_LCD(word, i, CLK);
-        delay_ms(200, CLK);
-        key = chk_Keypad();
-        if (key == K_Pnd) {
-            LCD_Locked(CLK);
-            return LOCKED;
-        }
-
-        if(i == 0x00) {
-            i = 0x4F;
-        }
-        else if ((i > 0x0F) && (i < 0x40)) {
-            i = 0x0F;
-        }
-    }
-    return UNLOCKED;
 }
 
 //
@@ -128,22 +109,24 @@ int chk_Password(uint8_t prevMode, int CLK)
     uint8_t addr = 0x40;
     uint8_t newMode;
 
-    key1 = chk_Key();
-    newMode = chk_Mode(K_NP, key1, prevMode, CLK);
+    key1 = chk_Key();   //Waits for first key entry
+    newMode = chk_Mode(K_NP, key1, prevMode, CLK);  //Checks for alternate mode entry
     if (newMode == PRIVATE) {
         delay_ms(200, CLK);
-        return ~prevMode;
+        return ~prevMode;   //Enters or exits privacy mode
     }
     else if (newMode == CLEAR) {
-        return prevMode;
+        return prevMode;    //Resets password entry
     }
 
+    //Prints characters entered to LCD if in non-privacy mode
     if (prevMode == NORMAL) {
         write_char_LCD(key1, addr, CLK);
         addr++;
     }
     delay_ms(300, CLK);
 
+    //Repeats process for second key press
     key2 = chk_Key();
     newMode = chk_Mode(key1, key2, CLK);
     if (newMode == PRIVATE) {
@@ -160,6 +143,7 @@ int chk_Password(uint8_t prevMode, int CLK)
     }
     delay_ms(300, CLK);
 
+    //Repeats process for third key press
     key3 = chk_Key();
     newMode = chk_Mode(key2, key3, CLK);
     if (newMode == PRIVATE) {
@@ -176,6 +160,7 @@ int chk_Password(uint8_t prevMode, int CLK)
     }
     delay_ms(300, CLK);
 
+    //Repeats process for fourth key press
     key4 = chk_Key();
     newMode = chk_Mode(key3, key4, CLK);
     if (newMode == PRIVATE) {
@@ -192,6 +177,7 @@ int chk_Password(uint8_t prevMode, int CLK)
     }
     delay_ms(300, CLK);
 
+    //Compares passcode entered against correct combo stored in outside header file
     if ((key1 == combo1) && (key2 == combo2) && (key3 == combo3) && (key4 == combo4)) {
         return UNLOCKED;
     }
@@ -204,21 +190,24 @@ int chk_Password(uint8_t prevMode, int CLK)
 
 }
 
+//Checks for a key press and returns the ASCII character pressed
 uint8_t chk_Key()
 {
     uint8_t key = 0x10;
     while(key == 0x10)
     {
-        key = chk_Keypad();
+        key = chk_Keypad(); //Waits until key is pressed
     }
     return key;
 }
 
+//Sets up non-privacy mode lock screen message
 void LCD_Locked(int CLK)
 {
     uint8_t addr;
     uint8_t letter;
     char word[] = "LOCKED ENTER KEY";
+
     //Writes lock phrase
     addr = 0x00;
     clear_LCD(CLK);
@@ -228,4 +217,32 @@ void LCD_Locked(int CLK)
     letter = 0x10;
     addr   = 0x3F;
     write_char_LCD(letter, addr, CLK);
+}
+
+//Scrolls unlock message and waits for lock input
+int LCD_Unlocked(int CLK)
+{
+    int i;
+    uint8_t key;
+    char word[] = "HELLO WORLD";
+    for(i = 0x4F; i >= 0x00; i--) {
+        clear_LCD(CLK);
+        write_string_LCD(word, i, CLK);
+        delay_ms(200, CLK);
+        key = chk_Keypad();
+
+        //Locks LCD if "#" is pressed
+        if (key == K_Pnd) {
+            LCD_Locked(CLK);
+            return LOCKED;
+        }
+        //Handles edge cases
+        if(i == 0x00) {
+            i = 0x4F;
+        }
+        else if ((i > 0x0F) && (i < 0x40)) {
+            i = 0x0F;
+        }
+    }
+    return UNLOCKED;
 }
