@@ -9,13 +9,7 @@
  */
 
 #include "msp.h"
-
-#define F_1p5_MeHz  15      //Defines various frequency values in almost MHz (10^5)
-#define F_3_MeHz    30      //MeHz labels are used to indicate this
-#define F_6_MeHz    60      //Blame data type truncation
-#define F_12_MeHz   120
-#define F_24_MeHz   240
-#define F_48_MeHz   480
+#include "delays.h"
 
 //Takes in desired time delay in ms and clock frequency in MeHz
 //Accurate to less than 1%

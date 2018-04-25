@@ -16,6 +16,7 @@ delays.obj: C:/ti/ccsv8/ccs_base/arm/include/CMSIS/core_cm4.h
 delays.obj: C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h
 delays.obj: C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h
 delays.obj: C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h
+delays.obj: ../delays.h
 
 ../delays.c: 
 C:/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -33,3 +34,4 @@ C:/ti/ccsv8/ccs_base/arm/include/CMSIS/core_cm4.h:
 C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h: 
 C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h: 
 C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h: 
+../delays.h: 

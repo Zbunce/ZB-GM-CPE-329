@@ -18,24 +18,11 @@
 #define LOCKED      1
 #define UNLOCKED    0
 
-//ASCII hex values for keypad characters
-#define K_1     0x31
-#define K_2     0x32
-#define K_3     0x33
-
-#define K_4     0x34
-#define K_5     0x35
-#define K_6     0x36
-
-#define K_7     0x37
-#define K_8     0x38
-#define K_9     0x39
-
-#define K_Ast   0x2A
-#define K_0     0x30
-#define K_Pnd   0x23
-
-#define K_NP    0x10
+//Operating mode indicators
+#define NORMAL      1
+#define PRIVATE     3
+#define PRIVLOCK    0xFE
+#define CLEAR       7
 
 void delay_ms(int, int);
 void set_DCO(int);
@@ -43,153 +30,182 @@ void LCD_INIT(int);
 void write_char_LCD(uint8_t, uint8_t, int);
 void write_string_LCD(char word[], uint8_t, int);
 void clear_LCD(int);
+void line_clear_LCD(int, int);
 void KEYPAD_INIT();
 uint8_t chk_Keypad();
 
 uint8_t chk_Key();
-int chk_Password(int);
-int chk_Privacy();
+int chk_Password(uint8_t, int);
 void LCD_Locked(int);
 int LCD_Unlocked(int);
+int chk_Privacy(uint8_t, uint8_t);
 
 void main(void)
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
 
     int CLK = 480;
-    int lock = LOCKED;
+    uint8_t lock = LOCKED;
     set_DCO(CLK);
     LCD_INIT(CLK);
     KEYPAD_INIT();
 
+    LCD_Locked(CLK);
+
     while(1)
     {
-        delay_ms(200, CLK);
-        clear_LCD(CLK);
-        while(lock == LOCKED)
+        while((lock == LOCKED) || (lock == PRIVLOCK))
         {
-            LCD_Locked(CLK);
-            int priv = chk_Privacy();
-            if (priv == 1)
-            {
-                clear_LCD(CLK);
-                write_string_LCD("PRIVACY MODE", 0, CLK);
-                while (lock == LOCKED)
-                {
-                    lock = chk_Password(CLK);
-                }
-            }
-            else
-            {
-                lock = chk_Password(CLK);
-                clear_LCD(CLK);
-            }
-
+            line_clear_LCD(BOTTOM, CLK);
+            lock = chk_Password(lock, CLK);
+            line_clear_LCD(BOTTOM, CLK);
         }
 
         while(lock == UNLOCKED)
         {
             lock = LCD_Unlocked(CLK);
-
+            delay_ms(200, CLK);
         }
 
     }
+}
+
+int chk_Mode(uint8_t prevKey, uint8_t curKey, uint8_t mode, int CLK)
+{
+    if (curKey == K_Ast)
+    {
+        if (prevKey == K_Pnd)
+        {
+            if (mode == PRIVLOCK)
+            {
+                clear_LCD(CLK);
+                LCD_Locked(CLK);
+                return PRIVATE;
+            }
+            else
+            {
+                clear_LCD(CLK);
+                write_string_LCD("PRIVATE MODE", 0, CLK);
+                return PRIVATE;
+            }
+
+        }
+
+        line_clear_LCD(BOTTOM, CLK);
+        return CLEAR;
+    }
+    return NORMAL;
 }
 
 int LCD_Unlocked(int CLK)
 {
     int i;
     uint8_t key;
-    char word[] = "HELLO GERF";
-    for(i = 0x00; i <= 0x4F; i++) {
-        write_char_LCD(K_NP, i-1, CLK);
+    char word[] = "HELLO WORLD";
+    for(i = 0x4F; i >= 0x00; i--) {
+        clear_LCD(CLK);
         write_string_LCD(word, i, CLK);
         delay_ms(200, CLK);
         key = chk_Keypad();
         if (key == K_Pnd) {
+            LCD_Locked(CLK);
             return LOCKED;
         }
-        if ((i > 0x0F) && (i < 0x40)) {
-            i = 0x40;
+
+        if(i == 0x00) {
+            i = 0x4F;
         }
-        else if(i == 0x4F) {
-            write_char_LCD(K_NP, i, CLK);
-            i = 0x00;
+        else if ((i > 0x0F) && (i < 0x40)) {
+            i = 0x0F;
         }
     }
     return UNLOCKED;
 }
 
 //
-int chk_Password(int CLK)
+int chk_Password(uint8_t prevMode, int CLK)
 {
     uint8_t key1;
     uint8_t key2;
     uint8_t key3;
     uint8_t key4;
     uint8_t addr = 0x40;
-    uint8_t priv = 0;
+    uint8_t newMode;
 
     key1 = chk_Key();
-    write_char_LCD(key1, addr, CLK);
-    addr++;
-    if (key1 == K_Ast) {
-        clear_LCD(CLK);
-        return LOCKED;
+    newMode = chk_Mode(K_NP, key1, prevMode, CLK);
+    if (newMode == PRIVATE) {
+        delay_ms(200, CLK);
+        return ~prevMode;
     }
-    delay_ms(500, CLK);
+    else if (newMode == CLEAR) {
+        return prevMode;
+    }
 
+    if (prevMode == NORMAL) {
+        write_char_LCD(key1, addr, CLK);
+        addr++;
+    }
+    delay_ms(300, CLK);
 
     key2 = chk_Key();
-    priv = chk_Privacy(key1, key2);
-    if (priv == 1) {
+    newMode = chk_Mode(key1, key2, prevMode, CLK);
+    if (newMode == PRIVATE) {
+        delay_ms(200, CLK);
+        return ~prevMode;
+    }
+    else if (newMode == CLEAR) {
+        return prevMode;
+    }
 
+    if (prevMode == NORMAL) {
+        write_char_LCD(key2, addr, CLK);
+        addr++;
     }
-    write_char_LCD(key2, addr, CLK);
-    addr++;
-    if (key2 == K_Ast) {
-        clear_LCD(CLK);
-        return LOCKED;
-    }
-    delay_ms(500, CLK);
+    delay_ms(300, CLK);
 
     key3 = chk_Key();
-    write_char_LCD(key3, addr, CLK);
-    addr++;
-    if (key3 == K_Ast) {
-        clear_LCD(CLK);
-        return LOCKED;
+    newMode = chk_Mode(key2, key3, prevMode, CLK);
+    if (newMode == PRIVATE) {
+        delay_ms(200, CLK);
+        return ~prevMode;
     }
-    delay_ms(500, CLK);
+    else if (newMode == CLEAR) {
+        return prevMode;
+    }
+
+    if (prevMode == NORMAL) {
+        write_char_LCD(key3, addr, CLK);
+        addr++;
+    }
+    delay_ms(300, CLK);
 
     key4 = chk_Key();
-    write_char_LCD(key4, addr, CLK);
-    addr++;
-    if (key4 == K_Ast) {
-        clear_LCD(CLK);
-        return LOCKED;
+    newMode = chk_Mode(key3, key4, prevMode,  CLK);
+    if (newMode == PRIVATE) {
+        delay_ms(200, CLK);
+        return ~prevMode;
     }
-    delay_ms(500, CLK);
+    else if (newMode == CLEAR) {
+        return prevMode;
+    }
+
+    if (prevMode == NORMAL) {
+        write_char_LCD(key4, addr, CLK);
+        addr++;
+    }
+    delay_ms(300, CLK);
 
     if ((key1 == combo1) && (key2 == combo2) && (key3 == combo3) && (key4 == combo4)) {
         return UNLOCKED;
     }
     else {
-        return LOCKED;
+        line_clear_LCD(BOTTOM, CLK);
+        write_string_LCD("INCORRECT CODE", 0x40, CLK);
+        delay_ms(500, CLK);
+        return prevMode;
     }
 
-}
-
-int chk_Privacy(uint8_t prevKey, uint8_t curKey)
-{
-   if (prevKey == K_Pnd)
-   {
-       if (curKey == K_Ast)
-       {
-           return 1;
-       }
-   }
-   return 0;
 }
 
 uint8_t chk_Key()
@@ -209,6 +225,7 @@ void LCD_Locked(int CLK)
     char word[] = "LOCKED ENTER KEY";
     //Writes lock phrase
     addr = 0x00;
+    clear_LCD(CLK);
     write_string_LCD(word, addr, CLK);
 
     //Sets cursor to bottom row
