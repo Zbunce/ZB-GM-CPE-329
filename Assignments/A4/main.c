@@ -26,19 +26,19 @@ void set_DCO(int);
 
 void main(void)
 {
-    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
+	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
 
-    int CLK = 480;
-    set_DCO(CLK);
-    LCD_INIT(CLK);
-    KEYPAD_INIT();
+	int CLK = 480;
+	set_DCO(CLK);
+	LCD_INIT(CLK);
+	KEYPAD_INIT();
 
-    uint8_t key = 0x10;
-    uint8_t addr = 0x00;
-    while(1) {
-        while(key == 0x10) {
-            key = chk_Keypad();
-        }
+	uint8_t key = 0x10;
+	uint8_t addr = 0x00;
+	while(1) {
+	    while(key == 0x10) {
+	        key = chk_Keypad();
+	    }
 
         write_char_LCD(key, addr, CLK);
         home_LCD(CLK);

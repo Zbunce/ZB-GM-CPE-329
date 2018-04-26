@@ -23,17 +23,17 @@ void home_LCD(int);
 
 void main()
 {
-    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
-    int CLK = 480;
+	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
+	int CLK = 480;
 
-    set_DCO(CLK);
+	set_DCO(CLK);
     LCD_INIT(CLK);
-    unsigned char string[]  = "Hello";
+    unsigned char letter  = 0x41;
     unsigned char addr    = 0x00;
 
     //Writes an "A" to the top left pixel, and then clears it.
     while(1) {
-        write_string_LCD(string, addr, CLK);
+        write_char_LCD(letter, addr, CLK);
         delay_ms(500, CLK);
         clear_LCD(CLK);
         delay_ms(500, CLK);

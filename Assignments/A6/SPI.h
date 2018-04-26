@@ -9,7 +9,7 @@
 #define SPI_H_
 
 
-
+void sendByte_SPI(uint8_t)
 
 
 #endif /* SPI_H_ */

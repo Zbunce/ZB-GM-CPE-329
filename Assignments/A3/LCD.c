@@ -32,16 +32,16 @@
 #define SHIFT_SET   0x10 //0x10 shifts cursor or disp
 #define ENTRY_SET   0x06 //0x06 -> cursor++
 
-void LCD_CMD(uint8_t, uint8_t, int);
-void LCD_CTRL(uint8_t, int);
+void LCD_CMD(unsigned char, unsigned char, int);
+void LCD_CTRL(unsigned char, int);
 
 //Takes in DDRAM address pixel and ASCII character sym
 //0x00...0x0F DDRAM Addresses
 //0x40...0x4F
-void write_char_LCD(uint8_t sym, uint8_t pixel, int CLK)
+void write_char_LCD(unsigned char sym, unsigned char pixel, int CLK)
 {
     pixel |= DB7;
-    uint8_t CTRL = EN;
+    unsigned char CTRL = EN;
     LCD_CMD(pixel, CTRL, CLK);
     delay_us(37, CLK);
     CTRL = EN | RS;
@@ -70,12 +70,12 @@ void clear_LCD(int CLK)
 void LCD_INIT(int CLK)
 {
     P3 -> DIR |= RS | RW | EN;  //Sets reg directions
-    P4 -> DIR |= DB7 | DB6 | DB5 | DB4; //Not using all 4 so don't be lazy
+    P4 -> DIR = 0xFF;           //Using all 8 bits in reg so we can be lazy
 
     P3 -> OUT &= ~(RS | RW | EN);
-    P4 -> OUT &= ~(DB7 | DB6 | DB5 | DB4); //Sets output low
+    P4 -> OUT = 0x00;
     delay_ms(40, CLK);  //Waits for safe power up
-    P4 -> OUT |= 0x30;   //Sets wake up command
+    P4 -> OUT = 0x30;   //Sets wake up command
     delay_ms(5, CLK);
 
     LCD_CTRL(EN, CLK);  //Wake up #1
@@ -90,8 +90,7 @@ void LCD_INIT(int CLK)
     P3 -> OUT &= ~EN;
     delay_us(160, CLK);
 
-    P4 -> OUT &= ~(DB7 | DB6 | DB5 | DB4); //Sets output low
-    P4 -> OUT |= 0x20;   //Guess we're awake
+    P4 -> OUT = 0x20;   //Guess we're awake
     LCD_CTRL(EN, CLK);
     P3 -> OUT &= ~EN;
 
@@ -106,7 +105,7 @@ void LCD_INIT(int CLK)
 
 //Sets control bits to states given in CTRL
 //CTRL: Top three bits EN, RW, RS respectively
-void LCD_CTRL(uint8_t CTRL, int CLK)
+void LCD_CTRL(unsigned char CTRL, int CLK)
 {
     P3 -> OUT &= ~(RS | RW | EN); //Clears RS, RW, and EN
     P3 -> OUT |= CTRL; //Sets RS, RW, and EN to desired state
@@ -116,21 +115,19 @@ void LCD_CTRL(uint8_t CTRL, int CLK)
 //Writes to the 8 data bits of the LCD
 //Can access both data and instruction registers
 //30 us delays to ensure known timings
-void LCD_CMD(uint8_t CMD, uint8_t CTRL, int CLK)
+void LCD_CMD(unsigned char CMD, unsigned char CTRL, int CLK)
 {
-    P4 -> OUT &= ~(DB7 | DB6 | DB5 | DB4); //Sets output low
-    P4 -> OUT |= CMD & 0xF0;
+    P4 -> OUT = CMD;
     LCD_CTRL(CTRL, CLK);
     P3 -> OUT &= ~EN;   //Nibble 1
     delay_us(30, CLK);  //Nominal 10 ns
     if ((FXN_SET & DB4) == 0x00) {
         CMD = CMD << 4;
-        P4 -> OUT &= ~(DB7 | DB6 | DB5 | DB4); //Sets output low
-        P4 -> OUT |= CMD & 0xF0;
+        P4 -> OUT = CMD;
         LCD_CTRL(CTRL, CLK);
         P3 -> OUT &= ~EN;   //Nibble 2
         delay_us(30, CLK);  //Nominal 10 ns
     }
-    P4 -> OUT &= ~(DB7 | DB6 | DB5 | DB4);
+    P4 -> OUT = 0x00;
     delay_us(80, CLK); //Nominal 730 ns
 }

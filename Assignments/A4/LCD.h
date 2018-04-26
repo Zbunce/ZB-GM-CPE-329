@@ -2,7 +2,7 @@
  * LCD.h
  * Header file for LCD control.
  *
- * Created on: April 10, 2018
+ * Date: April 10, 2018
  * Author: Zach Bunce, Garrett Maxon
  */
 
@@ -12,7 +12,6 @@
 void LCD_INIT(int);
 void LCD_CMD(uint8_t, uint8_t, int);
 void write_char_LCD(uint8_t, uint8_t, int);
-void write_string_LCD(char word[], uint8_t, int);
 void clear_LCD(int);
 void home_LCD(int);
 
