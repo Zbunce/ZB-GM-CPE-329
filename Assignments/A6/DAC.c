@@ -1,7 +1,8 @@
 /**
  * DAC.c
  *
- * DAC management
+ * Contains functions for running the DAC
+ * Allows for DC voltages and various wave types to be automatically produced
  *
  * Date: April 25 2018
  * Authors: Zach Bunce, Garrett Maxon
@@ -13,88 +14,110 @@
 #include "DAC.h"
 #include "delays.h"
 
-void sendByte_SPI(uint8_t);
-void SPI_INIT();
-void write_DAC(uint16_t);
+static int z = 0;       //Timer division variable
+static int waveType;    //Wave property variables for ISR
+static int Vpp;
+static int Voff;
+static int freq;
+static int CLK;
 
-void delay_ms(int, int);
-void delay_us(int, int);
+static uint8_t sqw_ST;  //Square wave state variable for ISR
+
+static int UD;          //Triangle wave ISR variables
+static int16_t DN_Point;
+static int incDiv;
 
 void makeDC(int volt)
 {
-    uint16_t DN = (((4096*volt)/(Vref))*10);   //generating the DAC input code from given voltage
-    write_DAC(DN);
+    uint16_t DN = (((4096*volt)/(Vref))*10);    //Maps the 12-bit DAC value for the desired output voltage
+    write_DAC(DN);                              //Writes value to the DAC
 }
 
-void makeWave(int waveType, int Vpp, int offset, int period, int CLK)
+void makeWave(int waveT, int pp, int offset, int frequency, int clock)
 {
-    uint32_t i;
+    waveType = waveT;   //Links outside specified parameters to ISR globals
+    Vpp = pp;
+    Voff = offset;
+    freq = frequency;
+    CLK = clock;
 
-    if (waveType == square) //square
+    TIMER_A0->CCTL[0] = TIMER_A_CCTLN_CCIE;     //Enables TACCR0 interrupt
+    //Runs Timer A on SMCLK and in continuous mode
+    TIMER_A0->CTL = TIMER_A_CTL_SSEL__SMCLK | TIMER_A_CTL_MC__CONTINUOUS;
+    SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;        //Enables sleep on exit from ISR
+
+    __enable_irq();                             //Enables global interrupts
+    NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31);   //Links ISR to NVIC
+
+    int top = Vpp + Voff;                       //Calculates peak voltage
+    int bot = Voff;                             //Calculates trough voltage
+
+    if (waveType == square)                     //Square wave
     {
-        int top     = Vpp + offset;      //top voltage
-        int bottom  = Vpp - offset;   //bottom voltage
-        int width   = period/2;       // width of pulse
-
-        while(1)
-        {
-            makeDC(top);                //makes top of the square wave
-            delay_ms(width , CLK);      //delays the width of the pulse
-            makeDC(bottom);             // makes the bottom of the pulse .
-            delay_ms(width , CLK);      //delays the width of the pulse
-        }
-
+        TIMER_A0->CCR[0] = 60000;               //Initializes first high time count
+        while(1);                               //Allows interrupt to control square wave generation
     }
-    else if (waveType == triangle)      //triangle
+    else if (waveType == triangle)              //Triangle wave
     {
-
-        int top      = Vpp + offset;    //top voltage
-        int bottom   = Vpp - offset;    //bottom voltage
-        int width    = period/2;        // width of pulse
-        uint16_t DN_Top     = (((4096*top)/(Vref))*10);     //finds the DAC input code of the top peak
-        uint16_t DN_Bottom  = (((4096*bottom)/(Vref))*10); // finds the DAC input code of the bottom peak
-        int delay = (width/(DN_Top - DN_Bottom))/1000; //finds how long each "step" needs to be in terms or microseconds to achieve the period
-
-        while(1)
-        {
-            uint16_t DN_Point = DN_Bottom;
-            while(DN_Point < DN_Top)
-            {
-                write_DAC(DN_Point);    //writes the voltage "point"
-                delay_us(delay, CLK);   // delays a little
-                DN_Point++;             // move the point up the slope
-            }
-
-            while(DN_Point > DN_Bottom)
-            {
-                write_DAC(DN_Point);    //writes the voltage "point"
-                delay_us(30, CLK);      // delays a little
-                DN_Point--;             // move the point down the slope
-            }
-            //back to top
-        }
-
-
+        DN_Point = (((4096*Voff)/(Vref))*10);           //Sets the initial DAC input to the trough
+        int16_t DN_Top     = (((4096*top)/(Vref))*10);  //Calculates the DAC input for the peak
+        int16_t DN_Bottom  = (((4096*bot)/(Vref))*10);  //Calculates the DAC input for the trough
+        incDiv = ((CLK * 1000000) / (2 * (DN_Top - DN_Bottom) * freq)); //Calculates the counter amount needed
+        TIMER_A0->CCR[0] = incDiv;              //Initializes first increment count
+        while(1);                               //Allows interrupt to control triangle wave generation
     }
-    else if (waveType == sine)
-    {
-        //not yet
-    }
-
 }
 
 void write_DAC(uint16_t data)
 {
-    uint8_t up_Byte  =  ((data & 0x0F00) >> 8);
-    up_Byte |= (GAIN1 | SDOFF);
-    uint8_t low_Byte =   (data & 0x00FF);
+    uint8_t up_Byte;
+    uint8_t low_Byte;
 
-    P2 -> DIR |= BIT4;
-    P2 -> OUT &= ~BIT4;
-    delay_us(50, 120);
-    sendByte_SPI(up_Byte);
-    delay_us(50, 120);
-    sendByte_SPI(low_Byte);
-    delay_us(50, 120);
-    P2 -> OUT |= BIT4;
+    up_Byte  =  ((data & 0x0F00) >> 8); //Masks top 4 data bits and shifts them into lower nibble
+    up_Byte &= 0x0F;                    //Redundantly masks the data bits after shifting
+    up_Byte |= (GAIN1 | SDOFF);         //Appends control bits onto upper nibble
+    low_Byte =   (data & 0x00FF);       //Masks bottom 8 data bits
+
+    P5 -> OUT &= ~BIT5;                 //Lowers chip select
+    sendByte_SPI(up_Byte);              //Transmits upper byte on SPI line
+    sendByte_SPI(low_Byte);             //Transmits lower byte on SPI line
+    P5 -> OUT |= BIT5;                  //Sets chip select
+}
+
+// Timer A0 interrupt service routine
+void TA0_0_IRQHandler(void) {
+    TIMER_A0->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG;  //Clears interrupt flag
+
+    if (waveType == square) {
+        int delCyc  = (CLK * 100000) / freq;    //Calculates frequency division needed
+        int timeDiv = delCyc / (60000*2);       //Maps this division to usable clock increments
+
+        if (z == timeDiv) {
+            sqw_ST = ~sqw_ST;                   //Inverts square wave level
+            if (sqw_ST == HIGH) {
+                makeDC((Vpp + Voff));           //Sets output voltage to high value
+            }
+            else if (sqw_ST == LOW) {
+                makeDC(Voff);                   //Sets output voltage to low value
+            }
+            z = 0;                              //Clears ISR entry counter
+        }
+        z++;                                    //Increments ISR entry counter
+        TIMER_A0->CCR[0] += 60000;              //Adds next offset to TACCR0
+    }
+    else if (waveType == triangle) {
+        int16_t DN_Top     = (((4096*(Vpp + Voff))/(Vref))*10); //Calculates the DAC input for the peak
+        int16_t DN_Bottom  = (((4096*Voff)/(Vref))*10);         //Calculates the DAC input for the trough
+        if (DN_Point >= DN_Top) {
+            UD = -10;               //Sets the wave to decrement
+            DN_Point = DN_Top;      //Ensures output is at peak value
+        }
+        else if (DN_Point <= DN_Bottom) {
+            UD = 10;                //Sets the wave to increment
+            DN_Point = DN_Bottom;   //Ensures output is at trough value
+        }
+        write_DAC(DN_Point);        //Sends the DAC value to the DAC
+        DN_Point += UD;             //Calculates increment or decrement for DAC value
+        TIMER_A0->CCR[0] += incDiv; //Adds 5ms offset to TACCR0
+    }
 }

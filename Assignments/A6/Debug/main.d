@@ -18,6 +18,7 @@ main.obj: C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h
 main.obj: C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h
 main.obj: ../set_DCO.h
 main.obj: ../delays.h
+main.obj: ../SPI.h
 main.obj: ../DAC.h
 
 ../main.c: 
@@ -38,4 +39,5 @@ C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h:
 C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h: 
 ../set_DCO.h: 
 ../delays.h: 
+../SPI.h: 
 ../DAC.h: 

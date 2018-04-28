@@ -1,7 +1,7 @@
 /**
  * SPI.h
  *
- * SPI management
+ * Header for SPI communication
  *
  * Date: April 25 2018
  * Authors: Zach Bunce, Garrett Maxon
