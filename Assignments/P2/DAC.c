@@ -27,6 +27,8 @@ static int UD;          //Triangle wave ISR variables
 static int16_t DN_Point;
 static int incDiv;
 
+
+
 void makeDC(int volt)
 {
     uint16_t DN = (((4096*volt)/(Vref))*10);    //Maps the 12-bit DAC value for the desired output voltage
@@ -119,5 +121,93 @@ void TA0_0_IRQHandler(void) {
         write_DAC(DN_Point);        //Sends the DAC value to the DAC
         DN_Point += UD;             //Calculates increment or decrement for DAC value
         TIMER_A0->CCR[0] += incDiv; //Adds 5ms offset to TACCR0
+    }
+    else if (waveType == sine) {
+        int i=0;
+            switch (freq)
+            {
+            case f100:
+
+                if caseInt == 1
+                {
+                  break;
+                }
+                else
+                {
+                    if intFlag == 1
+                    {
+                        i++;
+                        point = sinVal[i];
+                    }
+                    writeDac(point);
+                }
+                break;
+
+            case f200:
+
+                if caseInt == 1
+                {
+                  break;
+                }
+                else
+                {
+                    if intFlag == 1
+                    {
+                        i += 2;
+                        point = sinVal[i];
+                    }
+                    writeDac(point);
+                }
+                break;
+
+            case f300:
+                if caseInt == 1
+                {
+                  break;
+                }
+                else
+                {
+                    if intFlag == 1
+                    {
+                        i += 3;
+                        point = sinVal[i];
+                    }
+                    writeDac(point);
+                }
+                break;
+
+            case f400:
+                if caseInt == 1
+                {
+                  break;
+                }
+                else
+                {
+                    if intFlag == 1
+                    {
+                        i += 4;
+                        point = sinVal[i];
+                    }
+                    writeDac(point);
+                }
+                break;
+
+            case f500:
+                if caseInt == 1
+                {
+                  break;
+                }
+                else
+                {
+                    if intFlag == 1
+                    {
+                        i += 5;
+                        point = sinVal[i];
+                    }
+                    writeDac(point);
+                }
+                break;
+
+            }
     }
 }

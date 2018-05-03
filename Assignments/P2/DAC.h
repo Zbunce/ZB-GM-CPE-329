@@ -18,6 +18,11 @@
 #define GAIN1       BIT5    //Unity gain mode
 #define HIGH        0xFF    //Definitions for square wave states
 #define LOW         0x00
+#define f100        100
+#define f200        200
+#define f300        300
+#define f400        400
+#define f500        500
 
 void write_DAC(uint16_t);
 void makeDC(int);
