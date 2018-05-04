@@ -18,9 +18,11 @@
 #define f300 300
 #define f400 400
 #define f500 500
+
 #define square      1       //Wave type definitions
 #define triangle    2
 #define sine        3
+
 #define K_1     0x31
 #define K_2     0x32
 #define K_3     0x33
@@ -37,12 +39,12 @@
 #define K_0     0x30
 #define K_Pnd   0x23
 
-void delay_ms(int, int);
 void set_DCO(int);
 void LCD_INIT(int);
-void write_char_LCD(uint8_t, uint8_t, int);
 void write_string_LCD(char word[], uint8_t, int);
-void clear_LCD(int);
+void KEYPAD_INIT();
+uint8_t chk_Keypad();
+uint8_t chk_Key();
 
 
 void main(void)
