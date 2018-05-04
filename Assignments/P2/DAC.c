@@ -9,6 +9,7 @@
  */
 
 #include "msp.h"
+#include <math.h>
 #include <stdint.h>
 #include "SPI.h"
 #include "DAC.h"
@@ -18,30 +19,47 @@ static int z = 0;       //Timer division variable
 static int s = 0;       //Sin value index variable
 static int t = 0;       //Sawtooth value index variable
 static int waveType;    //Wave property variables for ISR
-static int DC
-static int freq;
 static int freq_idx;
-static int CLK;
-static int timeDiv;
 
-static uint8_t sqw_ST;  //Square wave state variable for ISR
+static int sinVal_DN[];
+static int sawVal_DN[];
+static int sinDel;
+static int sawDel;
+static int sqrDiv;
 
-static int UD;          //Triangle wave ISR variables
+static uint8_t sqr_ST;  //Square wave state variable for ISR
+
 static int16_t DN_Point;
-static int incDiv;
 
-static int[200] sinVal;
+static int intFlag = 0;
+
 
 void FG_INIT()
 {
     int i;
-    int x;
+    uint16_t sin_DN;
+    uint16_t saw_DN;
+    float sinVolt;
+    float x;
     int divs = 200;
-    int shift = 1000000;
-    for(i = 0; i < divs, i++) {
-        x = (2 * i * shift)/divs * M_PI;
-        sinVal[i] = sin(x);
+    //int shift = 10000;
+    for(i = 0; i <= divs; i++) {
+        x = (2 * i)/divs * M_PI;
+        sinVolt = sin(x);
+        sin_DN = ((4096 * sinVolt * 10) / Vref);           //Sets the sin DAC
+        saw_DN = ((4096 * i) / divs);           //Sets the sawtooth DAC
+        sinVal_DN[i] = sin_DN;
+        sawVal_DN[i] = saw_DN;
     }
+
+    TIMER_A0->CCTL[0] = TIMER_A_CCTLN_CCIE;     //Enables TACCR0 interrupt
+    //Runs Timer A on SMCLK and in continuous mode
+    TIMER_A0->CTL = TIMER_A_CTL_SSEL__SMCLK | TIMER_A_CTL_MC__CONTINUOUS;
+    //SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;        //Enables sleep on exit from ISR
+
+    __enable_irq();                             //Enables global interrupts
+    NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31);   //Links ISR to NVIC
+    TIMER_A0->CCR[0] = 60000;               //Initializes first high time count
 }
 
 void makeDC(int volt)
@@ -86,49 +104,58 @@ void makeWave(int waveT, int pp, int offset, int frequency, int clock)
     }
 }*/
 
-void makeWave(int waveT, int frequency, int duty, int clock)
+int chk_FGFlag() {
+    return intFlag;
+}
+
+void clr_FGFlag() {
+    intFlag = 0;
+}
+
+void makeWave(int waveT, int freq, int DC, int CLK)
 {
     waveType = waveT;   //Links outside specified parameters to ISR globals
-    freq = frequency;
-    freq_idx = frequency / 100;
-    DC = duty;
-    CLK = clock;
+    freq_idx = freq / 100;
 
-    int delCyc
-
-    //int16_t DN_Top     = HIGH;  //Calculates the DAC input for the peak
-    //int16_t DN_Bottom  = LOW;  //Calculates the DAC input for the trough
-
-    TIMER_A0->CCTL[0] = TIMER_A_CCTLN_CCIE;     //Enables TACCR0 interrupt
-    //Runs Timer A on SMCLK and in continuous mode
-    TIMER_A0->CTL = TIMER_A_CTL_SSEL__SMCLK | TIMER_A_CTL_MC__CONTINUOUS;
-    SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;        //Enables sleep on exit from ISR
-
-    __enable_irq();                             //Enables global interrupts
-    NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31);   //Links ISR to NVIC
-
-    //int top = Vpp + Voff;                       //Calculates peak voltage
-    //int bot = Voff;                             //Calculates trough voltage
+    int delCyc_H;
+    int delCyc_L;
+    int sqrDiv_H;
+    int sqrDiv_L;
 
     if (waveType == square)                     //Square wave
     {
-        delCyc  = (CLK * 100000) / freq;    //Calculates frequency division needed
-        timeDiv = delCyc / (60000*2);       //Maps this division to usable clock increments
-        write_DAC(sqw_ST);
-        TIMER_A0->CCR[0] = 60000;               //Initializes first high time count
+        delCyc_H  = (CLK * 100000 * DC) / (freq * 100);    //Calculates frequency division needed
+        sqrDiv_H = delCyc_H / (60000*2);       //Maps this division to usable clock increments
+        delCyc_L = (CLK * 100000 * (100 - DC)) / (freq * 100); //Calculates frequency division needed
+        sqrDiv_L = delCyc_L / (60000*2);       //Maps this division to usable clock increments
+        write_DAC(sqr_ST);
+        if (sqr_ST == HIGH) {
+            sqrDiv = sqrDiv_H;
+        }
+        else if (sqr_ST == LOW) {
+            sqrDiv = sqrDiv_L;
+        }
         //while(1);                               //Allows interrupt to control square wave generation
     }
-    else if (waveType == triangle)              //Triangle wave
-    {
-        DN_Point = (((4096*Voff)/(Vref))*10);   //Sets the initial DAC input to the trough
-        incDiv = ((CLK * 1000000) / (2 * (DN_Top - DN_Bottom) * freq)); //Calculates the counter amount needed
-        TIMER_A0->CCR[0] = incDiv;              //Initializes first increment count
-        while(1);                               //Allows interrupt to control triangle wave generation
+//    else if (waveType == triangle)              //Triangle wave
+//    {
+//        DN_Point = (((4096*Voff)/(Vref))*10);   //Sets the initial DAC input to the trough
+//        incDiv = ((CLK * 1000000) / (2 * (DN_Top - DN_Bottom) * freq)); //Calculates the counter amount needed
+//        TIMER_A0->CCR[0] = incDiv;              //Initializes first increment count
+//        //while(1);                               //Allows interrupt to control triangle wave generation
+//    }
+//    else if (waveType == sine)
+//    {
+//        write_DAC(DN_Point);
+//    }
+//    else if (waveType == sawtooth)
+//    {
+//        write_DAC(DN_Point);
+//    }
+    else {
+        write_DAC(DN_Point);
     }
-    else if (waveType == sine)
-    {
 
-    }
 }
 
 
@@ -152,14 +179,9 @@ void TA0_0_IRQHandler(void) {
     TIMER_A0->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG;  //Clears interrupt flag
 
     if (waveType == square) {
-        if (z == timeDiv) {
-            sqw_ST = ~sqw_ST;                   //Inverts square wave level
-            /*if (sqw_ST == HIGH) {
-                write_DAC(HIGH);           //Sets output voltage to high value
-            }
-            else if (sqw_ST == LOW) {
-                write_DAC(LOW);                   //Sets output voltage to low value
-            }*/
+        if (z == sqrDiv) {
+            sqr_ST = ~sqr_ST;                   //Inverts square wave level
+            DN_Point = sqr_ST;
             z = 0;                              //Clears ISR entry counter
         }
         z++;                                    //Increments ISR entry counter
@@ -181,11 +203,15 @@ void TA0_0_IRQHandler(void) {
         DN_Point += UD;             //Calculates increment or decrement for DAC value
         TIMER_A0->CCR[0] += incDiv; //Adds 5ms offset to TACCR0*/
     else if(waveType == sine) {
-        DN_Point = sinVal[s+freq_idx];
+        s += freq_idx;
+        DN_Point = sinVal_DN[s];
+        intFlag = 1;
         TIMER_A0->CCR[0] += sinDel;              //Adds next offset to TACCR0
     }
     else if(waveType == sawtooth) {
-        DN_Point = sawVal[t+freq_idx];
+        t += freq_idx;
+        DN_Point = sawVal_DN[t];
+        intFlag = 1;
         TIMER_A0->CCR[0] += sawDel;              //Adds next offset to TACCR0
     }
 }

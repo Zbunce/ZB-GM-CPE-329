@@ -28,6 +28,9 @@
 
 void write_DAC(uint16_t);
 void makeDC(int);
-void makeWave(int, int, int, int, int);
+void makeWave(int, int, int, int);
+int chk_FGFlag();
+void clr_FGFlag();
+void FG_INIT();
 
 #endif /* DAC_H_ */

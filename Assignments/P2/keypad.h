@@ -59,6 +59,7 @@
 #define K_NP    0x10
 
 void KEYPAD_INIT();
+uint8_t get_Key();
 uint8_t chk_Keypad();
 uint8_t KEY_LOCATE();
 
