@@ -13,6 +13,7 @@
 #define square      1       //Wave type definitions
 #define triangle    2
 #define sine        3
+#define sawtooth    4
 #define Vref        33      //Reference voltage * 10
 #define SDOFF       BIT4    //Shutdown mode OFF
 #define GAIN1       BIT5    //Unity gain mode

@@ -68,6 +68,14 @@ void makeWave(int waveT, int pp, int offset, int frequency, int clock)
         TIMER_A0->CCR[0] = incDiv;              //Initializes first increment count
         while(1);                               //Allows interrupt to control triangle wave generation
     }
+    else if (waveType == sine)
+    {
+
+    }
+    else if (waveType == sawtooth)
+    {
+
+    }
 }
 
 void write_DAC(uint16_t data)
@@ -122,12 +130,12 @@ void TA0_0_IRQHandler(void) {
         DN_Point += UD;             //Calculates increment or decrement for DAC value
         TIMER_A0->CCR[0] += incDiv; //Adds 5ms offset to TACCR0
     }
-    else if (waveType == sine) {
+    else if (waveType == sine)
+    {
         int i=0;
             switch (freq)
             {
             case f100:
-
                 if caseInt == 1
                 {
                   break;
@@ -142,9 +150,7 @@ void TA0_0_IRQHandler(void) {
                     writeDac(point);
                 }
                 break;
-
             case f200:
-
                 if caseInt == 1
                 {
                   break;
@@ -159,7 +165,6 @@ void TA0_0_IRQHandler(void) {
                     writeDac(point);
                 }
                 break;
-
             case f300:
                 if caseInt == 1
                 {
@@ -175,7 +180,6 @@ void TA0_0_IRQHandler(void) {
                     writeDac(point);
                 }
                 break;
-
             case f400:
                 if caseInt == 1
                 {
@@ -191,7 +195,6 @@ void TA0_0_IRQHandler(void) {
                     writeDac(point);
                 }
                 break;
-
             case f500:
                 if caseInt == 1
                 {
@@ -207,7 +210,10 @@ void TA0_0_IRQHandler(void) {
                     writeDac(point);
                 }
                 break;
-
             }
+    }
+    else if (waveType == sawtooth)
+    {
+
     }
 }
