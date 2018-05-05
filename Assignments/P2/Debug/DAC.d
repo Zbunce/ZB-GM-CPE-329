@@ -24,6 +24,7 @@ DAC.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/machine/_limit
 DAC.obj: ../SPI.h
 DAC.obj: ../DAC.h
 DAC.obj: ../delays.h
+DAC.obj: ../LUT.h
 
 ../DAC.c: 
 C:/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -49,3 +50,4 @@ C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/machine/_limits.h:
 ../SPI.h: 
 ../DAC.h: 
 ../delays.h: 
+../LUT.h: 

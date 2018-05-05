@@ -11,6 +11,7 @@ CMD_SRCS += \
 C_SRCS += \
 ../DAC.c \
 ../LCD.c \
+../LUT.c \
 ../SPI.c \
 ../delays.c \
 ../keypad.c \
@@ -22,6 +23,7 @@ C_SRCS += \
 C_DEPS += \
 ./DAC.d \
 ./LCD.d \
+./LUT.d \
 ./SPI.d \
 ./delays.d \
 ./keypad.d \
@@ -33,6 +35,7 @@ C_DEPS += \
 OBJS += \
 ./DAC.obj \
 ./LCD.obj \
+./LUT.obj \
 ./SPI.obj \
 ./delays.obj \
 ./keypad.obj \
@@ -44,6 +47,7 @@ OBJS += \
 OBJS__QUOTED += \
 "DAC.obj" \
 "LCD.obj" \
+"LUT.obj" \
 "SPI.obj" \
 "delays.obj" \
 "keypad.obj" \
@@ -55,6 +59,7 @@ OBJS__QUOTED += \
 C_DEPS__QUOTED += \
 "DAC.d" \
 "LCD.d" \
+"LUT.d" \
 "SPI.d" \
 "delays.d" \
 "keypad.d" \
@@ -66,6 +71,7 @@ C_DEPS__QUOTED += \
 C_SRCS__QUOTED += \
 "../DAC.c" \
 "../LCD.c" \
+"../LUT.c" \
 "../SPI.c" \
 "../delays.c" \
 "../keypad.c" \

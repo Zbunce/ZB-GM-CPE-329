@@ -6,6 +6,7 @@
  * Date: April 2 2018
  * Authors: Zach Bunce, Garrett Maxon
  */
+
 //Constant incr delay speccd
 //TIE LDAC LOW
 
@@ -23,8 +24,6 @@
 #include "SPI.h"
 #include "DAC.h"
 #include "LCD.h"
-
-uint8_t chk_Key();
 
 void main(void)
 {
@@ -50,7 +49,10 @@ void main(void)
     write_string_LCD(labels, 0, CLK);
 
     FG_INIT();
-
+//    while(1) {
+//        makeWave(waveT, frequency, duty, CLK);
+//    }
+//
     while(1)
     {
         switch (key)
@@ -90,7 +92,9 @@ void main(void)
             strcpy(waveType, "SAW");
             break;
         case K_Ast:
-            duty = duty - 10;
+            if (duty > 10) {
+                duty -= 10;
+            }
             switch(duty) {
             case 10:
                 strcpy(duty_Xfr, "10");
@@ -122,7 +126,9 @@ void main(void)
             }
             break;
         case K_Pnd:
-            duty = duty + 10;
+            if (duty < 90) {
+                duty += 10;
+            }
             switch(duty) {
             case 10:
                 strcpy(duty_Xfr, "10");
@@ -175,15 +181,8 @@ void main(void)
         delay_ms(200, CLK);
 
         while(key == K_NP) {
-            incFlag = chk_FGFlag();
-            if (incFlag == 1) {
-                makeWave(waveT, frequency, duty, CLK);
-            }
+            makeWave(waveT, frequency, duty, CLK);
             key = get_Key();
         }
     }
 }
-
-
-
-
