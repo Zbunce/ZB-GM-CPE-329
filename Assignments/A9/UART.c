@@ -1,14 +1,15 @@
 /*
  * UART.c
  * Encapsulates UART communication
- * getIntFlag, clrIntFlag, and getRXByte intended for external use
+ * getIntFlag, clrIntFlag, getRXByte, and sendByte_UART intended for external use
+ * UART_INIT must be run prior to the use of this library
  *
- * Date: May 7, 2018
+ * Date: May 11, 2018
  * Author: Zach Bunce, Garrett Maxon
  */
 
 #include "msp.h"
-#include "keypad.h"
+//#include "keypad.h"
 #include <STDINT.h>
 
 static int RX_Val = 0;
