@@ -13,7 +13,6 @@
 #include <stdint.h>
 #include "SPI.h"
 #include "DAC.h"
-#include "delays.h"
 
 static int c = 0;           //Square value index variable
 static int s = 0;           //Sin value index variable
