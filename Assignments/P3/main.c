@@ -62,14 +62,27 @@ int measFreq_DMM()
 
 }
 
-//Initializes terminal display
-void DISP_INIT()
+/* Spec:
+ * baud > 9600
+ * Fields displayed in fixed locations
+ * Display AC Voltage
+ * Display DC Voltage
+ * Display Frequency
+ * Organize through borders
+ * Bar graph of true RMS with scale
+ * Bar graph for DC voltage with scale
+ * Bar graphs will be a single line wide
+ * Bar graphs will have set lengths?
+ * Bar graphs will respond in real time
+ */
+//Updates values displayed in the terminal
+void updateDisp_DMM()
 {
 
 }
 
-//Updates values displayed in the terminal
-void updateDisp_DMM()
+//Initializes terminal display
+void DISP_INIT()
 {
 
 }
