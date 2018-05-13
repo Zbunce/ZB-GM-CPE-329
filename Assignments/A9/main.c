@@ -11,6 +11,7 @@
 #include "ADC.h"
 #include "UART.h"
 #include "set_DCO.h"
+#include "delays.h"
 
 void main(void)
 {
@@ -28,9 +29,12 @@ void main(void)
         // Start sampling/conversion
         DR_ADC_FLG = getIntFlag_ADC();
         if (DR_ADC_FLG == 1) {
+            __disable_irq();
             volt = calcVolt_ADC();
             sendVolt_ADC(volt);
             clrIntFlag_ADC();
+            delay_ms(500, CLK);
+            __enable_irq();
         }
     }
 }
