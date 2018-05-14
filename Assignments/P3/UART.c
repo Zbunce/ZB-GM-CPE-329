@@ -9,7 +9,9 @@
  */
 
 #include "msp.h"
+#include "UART.h"
 #include <STDINT.h>
+#include <strings.h>
 
 static int RX_Val = 0;
 static int UART_FLG = 0;
@@ -52,6 +54,15 @@ void sendByte_UART(uint8_t TX_Data)
 {
     while(!(EUSCI_A0 -> IFG & EUSCI_A_IFG_TXIFG));  //Waits for TX flag to clear
     EUSCI_A0 -> TXBUF = TX_Data;    //Drops data into TX buffer
+}
+
+void sendString_UART(uint8_t word[])
+{
+    uint8_t i;
+    uint8_t len = strlen(word);
+    for(i = 0; i < len; i++) {
+        sendByte_UART(word[i]);
+    }
 }
 
 //Handles RX Interrupt
