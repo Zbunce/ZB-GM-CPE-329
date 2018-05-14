@@ -83,7 +83,10 @@ int measACV_DMM()
 //Subprocess of measACV
 int measTRMS_DMM()
 {
-	
+	// formula is VRMS = sqrt((v1^2+v2^2+....+Vn^2)/n)
+	//to do this i need to sample a given amount of times based on the frequency
+	//perferable the whole period then with those samples i can sqare them and then divide by # of samples
+	// then just sqrt the whole thing   DO I NEED TO USE A DOUBLE?
 	
 	
 	//FAKE RMS till i get the frequency working
@@ -100,6 +103,7 @@ int measPktoPk_DMM()
 	int volt = calcVolt_ADC();
 	int topVal = volt;
 	int bottomVal = volt ;
+	//NEED FREQUENCY TO TAKE SAMPLES OVER THE WHOLE PERIOD 
 	for ( calcVolt_ADC() > topVal)
 	{
 		topVal = volt;
@@ -120,6 +124,7 @@ int measPktoPk_DMM()
  */
 int measFreq_DMM()
 {
+	//GERFENS CODE
 	P2 -> SEL0 |= BIT5;
 	P2 -> DIR  &= ~BIT5;
 	
@@ -136,10 +141,13 @@ int measFreq_DMM()
 	
 	while(1)
 	{
-		__DISABLE_IRQ();
-		capturePeriod = captureValue[1] - captureValue[0];
-		captureFlag = 0;
-		__ENABLE_IRQ();
+		if (captureFlag)
+		{
+			__DISABLE_IRQ();
+			capturePeriod = captureValue[1] - captureValue[0];
+			captureFlag = 0;
+			__ENABLE_IRQ();
+		}
 	
 	}
 }
@@ -282,14 +290,14 @@ void DISP_INIT()
 
 void TA0_0_IRQHandler(void) 
 {
+	//GERFENS CODE
 	volatile static unint32_t captureCount -0;
 	if (TIMER_A0 -> CCTL[2] = TIMER_A_CCTL_CCIFG)
 	{
-		captureValue [captureCount] = TIMER_A0 -> CCR[2];
-		captureCount++;
+		captureValue [captureCount++] = TIMER_A0 -> CCR[2];
 		if (captureCount ==2)
 		{
-			captureCount =0'
+			captureCount =0;
 			captureFlag =1;
 		}
 		TIMER_A0 - CCTL[2] &= ~TIMER_A_CCTL_CCIFG;
