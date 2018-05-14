@@ -17,13 +17,14 @@
 #define Vref        33      //Reference voltage * 10
 #define SDOFF       BIT4    //Shutdown mode OFF
 #define GAIN1       BIT5    //Unity gain mode
-#define HIGH        0xFF    //Definitions for square wave states
-#define LOW         0x00
-#define f100        100
-#define f200        200
-#define f300        300
-#define f400        400
-#define f500        500
+#define HIGH        0xFFF   //Definitions for square wave states
+#define LOW         0x000
+
+#define F_100Hz     100
+#define F_200Hz     200
+#define F_300Hz     300
+#define F_400Hz     400
+#define F_500Hz     500
 
 void write_DAC(uint16_t);
 void makeDC(int);

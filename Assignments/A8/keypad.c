@@ -16,6 +16,7 @@ static int keyFlag = 0;
 
 uint8_t get_Key()
 {
+    keyOut = chk_Keypad();
     return keyOut;
 }
 
@@ -28,8 +29,6 @@ void clear_Flag()
 {
     keyFlag = 0;
 }
-
-uint8_t KEY_LOCATE();
 
 //Sets P4.0-4.3 as rows and P5.0-5.2 as columns
 void KEYPAD_INIT()
@@ -101,5 +100,5 @@ uint8_t KEY_LOCATE()
 
 void keypad_ISR()
 {
-    keyOut = chk_Keypad;
+    //keyOut = chk_Keypad;
 }

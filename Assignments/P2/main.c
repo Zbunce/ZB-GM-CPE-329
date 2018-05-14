@@ -1,65 +1,40 @@
-#include "msp.h"
-
-
 /**
  * main.c
+ *
+ * Sets up SPI and generates specified wave
+ *
+ * Date: April 2 2018
+ * Authors: Zach Bunce, Garrett Maxon
  */
+//Constant incr delay speccd
+//TIE LDAC LOW
+
+//P1.5 SCLK
+//P1.6 MOSI
+//P1.7 MISO
 
 #include "msp.h"
+#include <stdint.h>
+#include <math.h>
 #include "set_DCO.h"
 #include "delays.h"
-#include "LCD.h"
-#include "keypad.h"
-#include "combo.h"
+#include "SPI.h"
 #include "DAC.h"
-
-#define f100 100
-#define f200 200
-#define f300 300
-#define f400 400
-#define f500 500
-
-#define square      1       //Wave type definitions
-#define triangle    2
-#define sine        3
-
-#define K_1     0x31
-#define K_2     0x32
-#define K_3     0x33
-
-#define K_4     0x34
-#define K_5     0x35
-#define K_6     0x36
-
-#define K_7     0x37
-#define K_8     0x38
-#define K_9     0x39
-
-#define K_Ast   0x2A
-#define K_0     0x30
-#define K_Pnd   0x23
-
-void set_DCO(int);
-void LCD_INIT(int);
-void write_string_LCD(char word[], uint8_t, int);
-void KEYPAD_INIT();
-uint8_t chk_Keypad();
-uint8_t chk_Key();
-
 
 void main(void)
 {
-	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
+    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
 
-    int CLK = 480;
+    int CLK = 120;
     uint8_t lock = LOCKED;
     set_DCO(CLK);
     LCD_INIT(CLK);
-    KEYPAD_INIT()
+    KEYPAD_INIT();
+    SPI_INIT();                                 //Initializes SPI comms
 
     int waveT = 1; // default values
     int frequency = 100;
-    int  duty = 500;  //not sure what this links to
+    int  duty = 50;  //not sure what this links to
 
     while(1)
     {
@@ -68,37 +43,58 @@ void main(void)
         {
         case K_1:
             frequency = 100;
+            break;
         case K_2:
             frequency = 200;
+            break;
         case K_3:
             frequency = 300;
+            break;
         case K_4:
             frequency = 400;
+            break;
         case K_5:
             frequency = 500;
+            break;
         case K_7:
             waveT = 1;
+            break;
         case K_8:
             waveT = 3;
+            break;
         case K_9:
             waveT = 4;
+            break;
         case K_Ast:
             duty = duty - 10;
+            break;
         case K_Pnd:
             duty = duty + 10;
+            break;
         case K_0:
-            duty = 500;
+            duty = 50;
+            break;
         }
+
         if (waveT = 1)
         {
-            word[] = "Duty Cycle: " + duty + "Wave Type: " + waveT;
+            word[] = "Type: " + waveT + " DC:" + duty + "%" + "Freq: " + freq + "Hz";
         }
         else
         {
-            word[] = "Frequency: " + frequency + "Wave Type: " + waveT;
+            word[] = "Type: " + waveT + "       " + "Freq: " + freq + "Hz";
         }
-        write_string_LCD(word, 1, CLK);
-        makeWave(waveT, pp, offset, frequency, CLK)
+
+        write_string_LCD(word, 0, CLK);
+
+        incFlag = chk_Flag();
+        if (incFlag == 1)
+		{
+            makeWave(waveT, frequency, DC, CLK)
+        }
+
+
+
 
     // write the wave
     // write the LCD
@@ -116,3 +112,7 @@ uint8_t chk_Key()
     }
     return key;
 }
+
+
+
+

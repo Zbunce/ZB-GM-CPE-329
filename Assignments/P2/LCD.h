@@ -22,16 +22,16 @@
 #define DB6         BIT6
 #define DB7         BIT7
 
-#define BOTTOM      1   //Defines top and bottom row indicators
+#define BOTTOM      1       //Defines top and bottom row indicators
 #define TOP         0
 
 #define DISP_CLR    0x01
 #define HOME_RET    0x02
 //Change the definitions below to change initialization
-#define DISP_SET    0x0F //0x0F Disp ON, Cursor ON, Blink ON
-#define FXN_SET     0x28 //0x28 4-Bit, 2 line, 5x8 font
-#define SHIFT_SET   0x10 //0x10 shifts cursor or disp
-#define ENTRY_SET   0x06 //0x06 -> cursor++
+#define DISP_SET    0x0F    //0x0F Disp ON, Cursor ON, Blink ON
+#define FXN_SET     0x28    //0x28 4-Bit, 2 line, 5x8 font
+#define SHIFT_SET   0x10    //0x10 shifts cursor or disp
+#define ENTRY_SET   0x06    //0x06 -> cursor++
 
 void LCD_INIT(int);
 void LCD_CMD(uint8_t, uint8_t, int);
