@@ -14,11 +14,8 @@
 
 //Run the program off globals, we'll encapsulate later. Way easier to manage than fxn passthrough
 static int msCount;
-<<<<<<< HEAD
 static int freqTime;
 static int periodCount;
-=======
->>>>>>> b734ef776fc494bb08e6a8d6558969391fef045c
 //static int totalVoltVal;
 
 //All measurements 4 digit HCD
@@ -28,17 +25,10 @@ static int frequency = 0;   //Frequency
 static int DCOffset  = 0;   //DC Offset
 static int AC_Flag = 0;     //High if AC detected
 static int vSample[100];     //Samples
-<<<<<<< HEAD
 
 volatile uint16_t captureValue[2] = {0,0};
 volatile uint16_t captureFlag = 0;
 
-=======
-
-volatile uint16_t captureValue[2] = {0,0};
-volatile uint16_t captureFlag = 0;
-
->>>>>>> b734ef776fc494bb08e6a8d6558969391fef045c
 void DISP_INIT();
 void measACV_DMM();
 void measDCV_DMM();
@@ -50,7 +40,6 @@ void updateDisp_DMM();
 void main(void)
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
-<<<<<<< HEAD
 
     int CLK = 240;
     int z = 0;
@@ -102,59 +91,6 @@ void TIMERS_INIT()
     TIMER_A0->CTL = TIMER_A_CTL_SSEL__SMCLK
                   | TIMER_A_CTL_MC__CONTINUOUS; //Runs Timer A on SMCLK and in continuous mode
 
-=======
-
-    int CLK = 240;
-    int z = 0;
-    set_DCO(CLK);
-    ADC_INIT();
-    UART_INIT(CLK, 115200);
-    DISP_INIT();
-
-    while(1) {
-     AC_Flag = getACFlag_DMM();
-        AC_Flag = 0;
-
-        if (AC_Flag == 1) {
-            measACV_DMM();
-            measFreq_DMM();
-        }
-        else {
-          measDCV_DMM();
-            ACVoltage = 0;
-            frequency = 0;
-            DCOffset = 0;
-        }
-        if (z == 10) {
-            z = 0;
-            DISP_INIT();
-        }
-        z++;
-        updateDisp_DMM();
-
-        if (DCVoltage == 0x3300) {
-            DCVoltage = 0;
-        }
-        else if ((DCVoltage & 0x0FFF) == 0x0900) {
-            DCVoltage += 0x1000;
-            DCVoltage -= 0x0900;
-        }
-        else {
-            DCVoltage += 0x0300;
-        }
-        delay_ms(500, CLK);
-    }
-}
-
-void TIMERS_INIT()
-{
-
-    TIMER_A0->CCTL[0] = TIMER_A_CCTLN_CCIE;     //Enables TACCR0 interrupt
-
-    TIMER_A0->CTL = TIMER_A_CTL_SSEL__SMCLK
-                  | TIMER_A_CTL_MC__CONTINUOUS; //Runs Timer A on SMCLK and in continuous mode
-
->>>>>>> b734ef776fc494bb08e6a8d6558969391fef045c
     __enable_irq();                             //Enables global interrupts
     NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31);
     TIMER_A0->CCR[0] = 240;     // math to get 10us 
@@ -387,7 +323,6 @@ void updateDisp_DMM()
         sendByte_UART(hunths);
         sendByte_UART(towths);
         sendByte_UART(A_V);
-<<<<<<< HEAD
 
         //Peak to Peak
         cursPhoneHome_ANSI();
@@ -457,77 +392,6 @@ void updateDisp_DMM()
             moveCursUp_ANSI(A_1);
         }
 
-=======
-
-        //Peak to Peak
-        cursPhoneHome_ANSI();
-        moveCursDown_ANSI(A_6);
-        moveCursRight_ANSI(A_9);
-        moveCursRight_ANSI(A_9);
-        moveCursRight_ANSI(A_8);
-        ones =   ((ACVoltage >> 12) & 0x0F) | 0x30;
-        tenths = ((ACVoltage >> 8)  & 0x0F) | 0x30;
-        hunths = ((ACVoltage >> 4)  & 0x0F) | 0x30;
-        towths = (ACVoltage & 0x0F) | 0x30;
-        sendByte_UART(ones);
-        sendByte_UART(A_DECML);
-        sendByte_UART(tenths);
-        sendByte_UART(hunths);
-        sendByte_UART(towths);
-        sendByte_UART(A_V);
-
-        //DC Offset
-        cursPhoneHome_ANSI();
-        moveCursDown_ANSI(A_7);
-        moveCursRight_ANSI(A_9);
-        moveCursRight_ANSI(A_9);
-        moveCursRight_ANSI(A_8);
-        ones =   ((DCOffset >> 12) & 0x0F) | 0x30;
-        tenths = ((DCOffset >> 8)  & 0x0F) | 0x30;
-        hunths = ((DCOffset >> 4)  & 0x0F) | 0x30;
-        towths = (DCOffset & 0x0F) | 0x30;
-        sendByte_UART(ones);
-        sendByte_UART(A_DECML);
-        sendByte_UART(tenths);
-        sendByte_UART(hunths);
-        sendByte_UART(towths);
-        sendByte_UART(A_V);
-
-        //Frequency
-        cursPhoneHome_ANSI();
-        moveCursDown_ANSI(A_9);
-        moveCursRight_ANSI(A_9);
-        moveCursRight_ANSI(A_9);
-        ones =   ((frequency >> 12)& 0x0F) | 0x30;  //Totally not ones place but go with it
-        tenths = ((frequency >> 8) & 0x0F) | 0x30;
-        hunths = ((frequency >> 4) & 0x0F) | 0x30;
-        towths = (frequency & 0x0F) | 0x30;
-        sendByte_UART(ones);
-        sendByte_UART(tenths);
-        sendByte_UART(hunths);
-        sendByte_UART(towths);
-    }
-    else {
-        cursPhoneHome_ANSI();
-        moveCursDown_ANSI(A_9);
-        moveCursDown_ANSI(A_6);
-        moveCursRight_ANSI(A_9);
-        moveCursRight_ANSI(A_9);
-        moveCursRight_ANSI(A_9);
-        moveCursRight_ANSI(A_9);
-        moveCursRight_ANSI(A_1);
-        for(i = 0; i < meter; i++) {
-            sendByte_UART(A_BLOCK);
-            moveCursLeft_ANSI(A_1);
-            moveCursUp_ANSI(A_1);
-        }
-        for(i = 0; i <= antimeter; i++) {
-            sendByte_UART(A_SPACE);
-            moveCursLeft_ANSI(A_1);
-            moveCursUp_ANSI(A_1);
-        }
-
->>>>>>> b734ef776fc494bb08e6a8d6558969391fef045c
         //DC Voltage
         cursPhoneHome_ANSI();
         moveCursDown_ANSI(A_4);
@@ -614,7 +478,6 @@ void DISP_INIT()
     moveCursRight_ANSI(A_6);
     sendString_UART(" |");
     sendString_UART(" 3.3  3.3  |");
-<<<<<<< HEAD
 
     cursPhoneHome_ANSI();
     moveCursDown_ANSI(A_5);
@@ -639,32 +502,6 @@ void DISP_INIT()
     sendString_UART("| 2.4  2.4  |");
 
     cursPhoneHome_ANSI();
-=======
-
-    cursPhoneHome_ANSI();
-    moveCursDown_ANSI(A_5);
-    sendString_UART("|  AC Peak-Peak Voltage: ");
-    moveCursRight_ANSI(A_6);
-    sendString_UART(" |");
-    sendString_UART(" 3.0  3.0  |");
-
-    cursPhoneHome_ANSI();
-    moveCursDown_ANSI(A_6);
-    sendString_UART("|  DC Offset    Voltage: ");
-    moveCursRight_ANSI(A_6);
-    sendString_UART(" |");
-    sendString_UART(" 2.7  2.7  |");
-
-    cursPhoneHome_ANSI();
-    moveCursDown_ANSI(A_7);
-    sendByte_UART(A_SSLSH);
-    for(i = 0; i < 31; i++) {
-        sendByte_UART(A_SPACE);
-    }
-    sendString_UART("| 2.4  2.4  |");
-
-    cursPhoneHome_ANSI();
->>>>>>> b734ef776fc494bb08e6a8d6558969391fef045c
     moveCursDown_ANSI(A_8);
     sendString_UART("|  AC Frequency: ");
     moveCursRight_ANSI(A_4);
