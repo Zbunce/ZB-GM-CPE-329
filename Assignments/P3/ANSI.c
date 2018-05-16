@@ -50,6 +50,7 @@ void cursPhoneHome_ANSI()
     sendByte_UART(A_H);
 }
 
+//Broken, don't use
 void moveCursRC_ANSI(uint8_t row, uint8_t col)
 {
     sendByte_UART(A_ESC);
