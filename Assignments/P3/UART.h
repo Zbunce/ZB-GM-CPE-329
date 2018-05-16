@@ -15,6 +15,6 @@ void clrIntFlag_UART();
 char getRXByte();
 void sendByte_UART(uint8_t);
 void sendString_UART(uint8_t word[]);
-void UART_INIT();
+void UART_INIT(int, int);
 
 #endif /* UART_H_ */

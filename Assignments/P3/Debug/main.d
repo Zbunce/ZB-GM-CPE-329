@@ -16,13 +16,17 @@ main.obj: C:/ti/ccsv8/ccs_base/arm/include/CMSIS/core_cm4.h
 main.obj: C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h
 main.obj: C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h
 main.obj: C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h
-main.obj: ../ANSI.h
-main.obj: ../ADC.h
-main.obj: ../UART.h
-main.obj: ../set_DCO.h
-main.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h
+main.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/math.h
 main.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/_ti_config.h
 main.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/linkage.h
+main.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/_defs.h
+main.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/machine/_limits.h
+main.obj: ../set_DCO.h
+main.obj: ../delays.h
+main.obj: ../ADC.h
+main.obj: ../ANSI.h
+main.obj: ../UART.h
+main.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h
 
 ../main.c: 
 C:/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -40,10 +44,14 @@ C:/ti/ccsv8/ccs_base/arm/include/CMSIS/core_cm4.h:
 C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h: 
 C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h: 
 C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h: 
-../ANSI.h: 
-../ADC.h: 
-../UART.h: 
-../set_DCO.h: 
-C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/math.h: 
 C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/_ti_config.h: 
 C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/linkage.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/_defs.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/machine/_limits.h: 
+../set_DCO.h: 
+../delays.h: 
+../ADC.h: 
+../ANSI.h: 
+../UART.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h: 
