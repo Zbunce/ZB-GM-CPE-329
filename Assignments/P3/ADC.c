@@ -36,6 +36,11 @@ int getIntFlag_ADC()
     return dataReady_FLG;
 }
 
+int getData_ADC()
+{
+    return anIn;
+}
+
 void clrIntFlag_ADC()
 {
     dataReady_FLG = 0;  //Clears sampled data ready flag
