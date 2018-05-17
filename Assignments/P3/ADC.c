@@ -36,44 +36,49 @@ int getIntFlag_ADC()
     return dataReady_FLG;
 }
 
+int getAnData_ADC()
+{
+    return anIn;
+}
+
 void clrIntFlag_ADC()
 {
     dataReady_FLG = 0;  //Clears sampled data ready flag
     ADC14 -> CTL0 |= ADC14_CTL0_ENC | ADC14_CTL0_SC;    //Takes next sample
 }
 
-//Calculates voltage corresponding to the sampled ADC number
+//Calculates voltage corresponding to the passed ADC number
 //Returns 3 digit BCD voltage value; 1s 10ths 100ths
-int calcVolt_ADC()
+int calcVolt_ADC(int extAN)
 {
     //N = Mapped digital number; M = Resolution Vin+ = Input voltage
     //Vr+ = Upper ref voltage; Vr- = Lower ref voltage
     //N = (2^M)*(Vin+ - Vr-)/(Vr+ - Vr-), 1LSB = (Vr+ - Vr-)/(2^M)
     //Vin+ = N * Vr+/(2^M) - (1+N/(2^M))Vr-
-    int anCal = anIn;
+    int anCal = extAN;
 
     //Calibrates the ADC depending on the voltage level
     //Calibration values found iteratively
-    if (anIn < 2500) {          //0V - 0.5V calibration
-        anCal = anIn + 30;
+    if (extAN < 2500) {          //0V - 0.5V calibration
+        anCal = extAN + 30;
     }
-    else if (anIn < 5000) {     //0.5V - 1V calibration
-        anCal = anIn + 50;
+    else if (extAN < 5000) {     //0.5V - 1V calibration
+        anCal = extAN + 50;
     }
-    else if (anIn < 7500) {    //1V - 1.5V calibration
-        anCal = anIn + 75;
+    else if (extAN < 7500) {    //1V - 1.5V calibration
+        anCal = extAN + 75;
     }
-    else if (anIn < 10000) {    //1.5V - 2V calibration
-        anCal = anIn + 90;
+    else if (extAN < 10000) {    //1.5V - 2V calibration
+        anCal = extAN + 90;
     }
-    else if (anIn < 10000) {    //2V - 2.5V calibration
-        anCal = anIn + 100;
+    else if (extAN < 10000) {    //2V - 2.5V calibration
+        anCal = extAN + 100;
     }
-    else if (anIn < 15000) {    //2.5V - 3V calibration
-        anCal = anIn + 100;
+    else if (extAN < 15000) {    //2.5V - 3V calibration
+        anCal = extAN + 100;
     }
     else {
-        anCal = anIn + 125;
+        anCal = extAN + 125;
     }
 
     //Calculates voltage digits separately utilizing integer rounding

@@ -14,7 +14,9 @@
 
 //Run the program off globals, we'll encapsulate later. Way easier to manage than fxn passthrough
 static int msCount;
-//static int totalVoltVal;
+static int freqTime;
+static int periodCount;
+static int msCount2;
 
 //All measurements 4 digit HCD
 static int ACVoltage = 0;   //Peak to Peak
@@ -22,6 +24,7 @@ static int DCVoltage = 0;   //DC/True RMS
 static int frequency = 0;   //Frequency
 static int DCOffset  = 0;   //DC Offset
 static int AC_Flag = 0;     //High if AC detected
+static int vSample[100];     //Samples
 
 volatile uint16_t captureValue[2] = {0,0};
 volatile uint16_t captureFlag = 0;
@@ -33,6 +36,7 @@ void measTRMS_DMM();
 void measPktoPk_DMM();
 void measFreq_DMM();
 void updateDisp_DMM();
+int getACFlag_DMM();
 
 void main(void)
 {
@@ -45,16 +49,17 @@ void main(void)
     UART_INIT(CLK, 115200);
     DISP_INIT();
 
+    AC_Flag = 0;
+
     while(1) {
 //        AC_Flag = getACFlag_DMM();
-        AC_Flag = 0;
 
         if (AC_Flag == 1) {
             measACV_DMM();
             measFreq_DMM();
         }
         else {
-//            measDCV_DMM();
+          measDCV_DMM();
             ACVoltage = 0;
             frequency = 0;
             DCOffset = 0;
@@ -80,17 +85,29 @@ void main(void)
     }
 }
 
-void TIMERS_INIT()
+void TIMER_INIT()
 {
+    //Schmitt input setup
+    P5->DIR = ~(uint8_t) BIT1;
+    P5->OUT = BIT1;
+    P5->SEL0 = 0;
+    P5->SEL1 = 0;
+    P5->IES = BIT0;                         // Interrupt on high-to-low transition
+    P5->IFG = 0;                            // Clear all P1 interrupt flags
+    P5->IE = BIT1;                          // Enable interrupt for P1.1
 
+    // Enable Port 5 interrupt on the NVIC
+    NVIC->ISER[1] = 1 << ((PORT5_IRQn) & 31);
+
+    //TIMER_A0 setup
     TIMER_A0->CCTL[0] = TIMER_A_CCTLN_CCIE;     //Enables TACCR0 interrupt
 
     TIMER_A0->CTL = TIMER_A_CTL_SSEL__SMCLK
                   | TIMER_A_CTL_MC__CONTINUOUS; //Runs Timer A on SMCLK and in continuous mode
 
-    __enable_irq();                             //Enables global interrupts
     NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31);
-    TIMER_A0->CCR[0] = 120;     // math to get 10us -> 1/12Mhz = 83ns  10us/83ns = 120
+    TIMER_A0->CCR[0] = 240;                     // math to get 10us
+    __enable_irq();                             //Enables global interrupts
 }
 
 /* Spec:
@@ -101,14 +118,18 @@ void TIMERS_INIT()
  */
 void measDCV_DMM()
 {
-//    int totalVoltVal = 0;
+    int averageSample = 0;
+    int sampleTotal = 0;
+    int totalVoltVal =0;
+    int i;
 
-    if ( msCount == 100)
+    for(i = 0; i < 100; i++)
     {
-//        averageVoltage = totalVoltVal/100;
-//        return averageVoltage;
+        sampleTotal += vSample[i];
     }
-//    return 0;
+    averageSample = sampleTotal/100; //average adc dc voltage number
+    DCVoltage = calcVolt_ADC(averageSample);
+
 }
 
 /* Spec:
@@ -129,38 +150,54 @@ void measACV_DMM()
 //Subprocess of measACV
 void measTRMS_DMM()
 {
-    // formula is VRMS = sqrt((v1^2+v2^2+....+Vn^2)/n)
-    //to do this i need to sample a given amount of times based on the frequency
-    //perferable the whole period then with those samples i can sqare them and then divide by # of samples
-    // then just sqrt the whole thing   DO I NEED TO USE A DOUBLE?
+    int squareTotal;
+    int i;
 
+    for(i=0; i<100; i++)
+    {
+        squareTotal += (vSample[i] * vSample[i]);
+    }
 
-    //FAKE RMS till i get the frequency working
-//    int PK2PK = measPktoPk_DMM();
-//    int TRMS = (PK2PK * 0.70710678118);
-//    return TRMS;
+    DCVoltage = sqrt( (squareTotal/100) );
 
 }
 
 //Subprocess of measACV
 void measPktoPk_DMM()
 {
-    int pkpk = 0;
-    int volt = calcVolt_ADC();
-//    int topVal = volt;
-//    int bottomVal = volt;
-    //NEED FREQUENCY TO TAKE SAMPLES OVER THE WHOLE PERIOD
-//    for ( calcVolt_ADC() > topVal)
-//    {
-//        topVal = volt;
-//    }
-//    for ( calcVolt_ADC() < bottomVal)
-//    {
-//        bottomVal = volt;
-//    }
-//    pk-pk = topVal - bottomVal;
-//    return pkpk;
+    int i;
+    int topVal = (vSample[0])+1; //initializing them with diff values so the for loop has no issues
+    int bottomVal = (vSample[0])-1;
+    int pkpk;
+
+    for(i = 0; i < 100; i++)
+    {
+        if(vSample[i] > topVal)
+        {
+            topVal = vSample[i];
+        }
+        if(vSample[i] < bottomVal)
+        {
+            bottomVal = vSample[i];
+        }
+    }
+
+    pkpk = topVal - bottomVal;
+
+    if ( pkpk > 2500 )
+    {
+        AC_Flag = 1;
+    }
+    else
+    {
+        AC_Flag = 0;
+    }
+
+    ACVoltage = calcVolt_ADC(pkpk);
 }
+
+
+
 
 /* Spec:
  * 1-1000Hz range
@@ -170,32 +207,33 @@ void measPktoPk_DMM()
  */
 void measFreq_DMM()
 {
-    //GERFENS CODE
-    P2 -> SEL0 |= BIT5;
-    P2 -> DIR  &= ~BIT5;
+    int edge1Time = 0;
+    int edge2Time = 0;
+    int time = 0;
 
-//    TIMER_A0 -> CCTL[2] =   TIMER_A_CCTL_CM_1 |
-//                            TIMER_A_CCTL_CCIS_0 |
-//                            TIMER_A_CCTL_CAP |
-//                            TIMER_A_CCTL_SCS;
-//    TIMER_A0 -> CCTL =      TIMER_A_TA0SSEL_2 |
-//                            TIMER_A_MC_CONTINUOUS |
-//                            TIMER_A_CLR;
-
-    NVIC -> ISER[0] = 1 << ((TA0_N_IRQn) &31);
-    __enable_irq();
-
-    while(1)
+    //keeps track of which falling rising edge were on
+    //if its on the first rising edge it stores the msCount value
+    //if its the second rising edge then it stores that msCount values into a sepreate variable
+    //then it subtracts the two msCounts to get the time between the rising edges
+    //with that it then calculates the frequency
+    if (periodCount == 1)
     {
-        if (captureFlag)
-        {
-            __disable_irq();
-//            capturePeriod = captureValue[1] - captureValue[0];
-            captureFlag = 0;
-            __enable_irq();
-        }
-
+        edge1Time = msCount2;
     }
+    else if(periodCount == 2)
+    {
+        edge2Time = msCount2;
+        time = edge2Time - edge1Time;
+        periodCount = 0;
+    }
+
+    frequency = 10000000 / time;
+}
+
+/* Port5 ISR */
+void PORT5_IRQHandler(void)
+{
+    periodCount++;
 }
 
 
@@ -531,4 +569,24 @@ void DISP_INIT()
     sendString_UART("_________/");
 
     cursPhoneHome_ANSI();
+}
+
+void TA0_0_IRQHandler(void)
+{
+
+    TIMER_A0->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG;  //Clears interrupt flag
+    TIMER_A0->CCR[0] += 240;
+
+    vSample[msCount] = getAnData_ADC();
+    msCount2++;
+
+    switch(msCount) {
+    case(99):
+        msCount = 0;
+        break;
+    default:
+        msCount++;
+        break;
+    }
+
 }

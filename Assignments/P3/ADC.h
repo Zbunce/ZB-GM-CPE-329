@@ -19,6 +19,7 @@
 void ADC_INIT();
 int getIntFlag_ADC();
 void clrIntFlag_ADC();
+int getAnData_ADC();
 int calcVolt_ADC();
 void sendVolt_ADC(int);
 
