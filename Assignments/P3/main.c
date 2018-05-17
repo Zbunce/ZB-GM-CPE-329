@@ -16,7 +16,7 @@
 static int msCount;
 static int freqTime;
 static int periodCount;
-//static int totalVoltVal;
+static int msCount2;
 
 //All measurements 4 digit HCD
 static int ACVoltage = 0;   //Peak to Peak
@@ -104,13 +104,15 @@ void TIMERS_INIT()
  */
 void measDCV_DMM()
 {
-	int totalVoltVal = 0;
+	int averageSample =0;
+	int totalVoltVal =0;
+	
 	for ( i=0; i<100; i++)
 	{
 		sampleTotal += vSample[i];
 	}
 	averageSample = sampleTotal/100; //average adc dc voltage number
-	DCVoltage = ad
+	DCVoltage = calcVolt_ADC(averageSample);
    
 }
 
@@ -132,38 +134,51 @@ void measACV_DMM()
 //Subprocess of measACV
 void measTRMS_DMM()
 {
-    // formula is VRMS = sqrt((v1^2+v2^2+....+Vn^2)/n)
-    //to do this i need to sample a given amount of times based on the frequency
-    //perferable the whole period then with those samples i can sqare them and then divide by # of samples
-    // then just sqrt the whole thing   DO I NEED TO USE A DOUBLE?
-
-
-    //FAKE RMS till i get the frequency working
-//    int PK2PK = measPktoPk_DMM();
-//    int TRMS = (PK2PK * 0.70710678118);
-//    return TRMS;
-
+	int sqaureTotal;
+	
+	for ( i=0; i<100; i++)
+	{
+		squareTotal += (vSample[i] * vSample[i]);
+	}
+	
+	DCVoltage = sqrt( (squareTotal/100) );
+	
 }
 
 //Subprocess of measACV
 void measPktoPk_DMM()
 {
-    int pkpk = 0;
-    int volt = calcVolt_ADC();
-    int topVal = volt;
-    int bottomVal = volt;
-    //NEED FREQUENCY TO TAKE SAMPLES OVER THE WHOLE PERIOD
-    for ( calcVolt_ADC() > topVal)
-    {
-      topVal = volt;
-   }
-  for ( calcVolt_ADC() < bottomVal)
+    int topVal = (vSample[i])+1; //initializing them with diff values so the for loop has no issues
+	int bottomVal = (vSample[i])-1;
+	
+	for ( i=0; i<100; i++)
 	{
-     bottomVal = volt;  
+		for ( vSample[i] > topVal)
+		{
+			topVal = vSample[i];
+		}
+		for ( vSample[i] < bottomVal)
+		{
+			bottomVal = vSample[i];  
+		}
 	}
+	
 	pk-pk = topVal - bottomVal;
-	return pkpk;
+	
+	if ( pk-pk > 2500 )
+	{
+		AC_Flag = 1;
+	}
+	else
+	{
+		AC_Flag = 0;
+	}
+	
+	ACVoltage = calcVolt_ADC(pk-pk);
 }
+
+	
+
 
 /* Spec:
  * 1-1000Hz range
@@ -178,11 +193,6 @@ void measFreq_DMM()
 	int edge2Time;
 	int time;
 	
-	
-   // Configuring P1.0 as output and P1.1 (switch) as input with pull-up
-    // resistor. Rest of pins are configured as output low.
-    // Notice intentional '=' assignment since all P1 pins are being
-    // deliberately configured
     P5->DIR = ~(uint8_t) BIT1;
     P5->OUT = BIT1;
     P5->SEL0 = 0;
@@ -203,22 +213,22 @@ void measFreq_DMM()
 	//with that it then calculates the frequency
 	if( periodCount ==2)
 	{
-		edge2Time = msCount;
+		edge2Time = msCount2;
 		time = edge2Time - edge1Time;
 		periodCount = 0;
 	}
 	else if (periodCount ==1)
 	{
-		edge1Time = msCount;
+		edge1Time = msCount2;
 	}
 	
-	frequency = 1 / time;
+	frequency = 10 / time;
 }
 
 /* Port5 ISR */
 void PORT5_IRQHandler(void)
 {
-	periodCount ++;
+	periodCount++;
 }
 
 
@@ -562,12 +572,11 @@ void TA0_0_IRQHandler(void)
     TIMER_A0->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG;  //Clears interrupt flag
 	TIMER_A0->CCR[0] += 240;
 	
-
 	vSample[msCount] = getData_ADC();
 	msCount++;
+	msCount2++;
 	if ( msCount == 100)
     {
 		msCount =0;
-    }
-	
+    }	
 }
