@@ -85,17 +85,19 @@ int calcVolt_ADC(int extAN)
     int ones    = (anCal * VRef) / (RES_14_MAX * 10);
     int tenths  = ((anCal * VRef) / RES_14_MAX) - (10 * ones);
     int hunths  = ((anCal * VRef * 10) / RES_14_MAX) - ((10 * tenths) + (100 * ones));
-    int voltage = ((ones & MASK_LOW_32) << 8) | ((tenths & MASK_LOW_32) << 4) |
-                   (hunths & MASK_LOW_32);
+    int towths  = ((anCal * VRef * 100) / RES_14_MAX) - ((10 * hunths) + (100 * tenths) + (1000 * ones));
+    int voltage = ((ones & MASK_LOW_32) << 12) | ((tenths & MASK_LOW_32) << 8) |
+                  ((hunths & MASK_LOW_32) << 4) | (towths & MASK_LOW_32);
     return voltage; //Returns BCD voltage
 }
 
 //Sends the calculated BCD voltage to the UART TX line
 void sendVolt_ADC(int volt)
 {
-    uint8_t ones = ((volt & 0xF00) >> 8) | 0x30; //Masks, shifts down, and converts BCD to ASCII
-    int tenths = ((volt & 0x0F0) >> 4) | 0x30;
-    int hunths = (volt & 0x00F) | 0x30;
+    uint8_t ones = ((volt & 0xF000) >> 12) | 0x30; //Masks, shifts down, and converts BCD to ASCII
+    int tenths = ((volt & 0x0F00) >> 8) | 0x30;
+    int hunths = ((volt & 0x00F0) >> 4) | 0x30;
+    int towths = (volt & 0x000F) | 0x30;
     sendByte_UART(ones);                         //Sends out each character
     sendByte_UART(DEC_PNT);
     sendByte_UART(tenths);

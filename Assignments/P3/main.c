@@ -30,6 +30,7 @@ volatile uint16_t captureValue[2] = {0,0};
 volatile uint16_t captureFlag = 0;
 
 void DISP_INIT();
+void TIMER_INIT();
 void measACV_DMM();
 void measDCV_DMM();
 void measTRMS_DMM();
@@ -48,18 +49,20 @@ void main(void)
     ADC_INIT();
     UART_INIT(CLK, 115200);
     DISP_INIT();
+    TIMER_INIT();
 
-    AC_Flag = 0;
+    AC_Flag = 1;
 
     while(1) {
 //        AC_Flag = getACFlag_DMM();
+        measPktoPk_DMM();
 
         if (AC_Flag == 1) {
             measACV_DMM();
             measFreq_DMM();
         }
         else {
-          measDCV_DMM();
+            measDCV_DMM();
             ACVoltage = 0;
             frequency = 0;
             DCOffset = 0;
@@ -70,18 +73,19 @@ void main(void)
         }
         z++;
         updateDisp_DMM();
+        //delay_ms(1, CLK);
 
-        if (DCVoltage == 0x3300) {
-            DCVoltage = 0;
-        }
-        else if ((DCVoltage & 0x0FFF) == 0x0900) {
-            DCVoltage += 0x1000;
-            DCVoltage -= 0x0900;
-        }
-        else {
-            DCVoltage += 0x0300;
-        }
-        delay_ms(500, CLK);
+//        if (DCVoltage == 0x3300) {
+//            DCVoltage = 0;
+//        }
+//        else if ((DCVoltage & 0x0FFF) == 0x0900) {
+//            DCVoltage += 0x1000;
+//            DCVoltage -= 0x0900;
+//        }
+//        else {
+//            DCVoltage += 0x0300;
+//        }
+//        delay_ms(500, CLK);
     }
 }
 
@@ -144,7 +148,6 @@ void measDCV_DMM()
 void measACV_DMM()
 {
     measTRMS_DMM();
-    measPktoPk_DMM();
 }
 
 //Subprocess of measACV
@@ -184,7 +187,7 @@ void measPktoPk_DMM()
 
     pkpk = topVal - bottomVal;
 
-    if ( pkpk > 2500 )
+    if (pkpk > 2500 )
     {
         AC_Flag = 1;
     }
@@ -577,7 +580,12 @@ void TA0_0_IRQHandler(void)
     TIMER_A0->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG;  //Clears interrupt flag
     TIMER_A0->CCR[0] += 240;
 
-    vSample[msCount] = getAnData_ADC();
+    int flag = getIntFlag_ADC();
+    if(flag) {
+        vSample[msCount] = getAnData_ADC();
+    }
+    clrIntFlag_ADC();
+
     msCount2++;
 
     switch(msCount) {
