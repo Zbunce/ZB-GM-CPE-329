@@ -97,7 +97,7 @@ void sendVolt_ADC(int volt)
     uint8_t ones = ((volt & 0xF000) >> 12) | 0x30; //Masks, shifts down, and converts BCD to ASCII
     int tenths = ((volt & 0x0F00) >> 8) | 0x30;
     int hunths = ((volt & 0x00F0) >> 4) | 0x30;
-    int towths = (volt & 0x000F) | 0x30;
+//    int towths = (volt & 0x000F) | 0x30;
     sendByte_UART(ones);                         //Sends out each character
     sendByte_UART(DEC_PNT);
     sendByte_UART(tenths);

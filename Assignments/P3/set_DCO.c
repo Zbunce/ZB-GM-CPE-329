@@ -50,7 +50,8 @@ void set_DCO(int freq)
 
         CS->CTL0 = CS_CTL0_DCORSEL_5;                                   //Sets DC0 to 48 MHz
         CS->CTL1 = CS->CTL1
-            & ~(CS_CTL1_SELM_MASK | CS_CTL1_DIVM_MASK)| CS_CTL1_SELM_3; //Sets MCLK to DCO
+            & ~(CS_CTL1_SELM_MASK | CS_CTL1_DIVM_MASK)| CS_CTL1_SELM_3  //Sets MCLK to DCO
+            | CS_CTL1_SELA_2 | CS_CTL1_SELS_3;  //Sets the clock refs
         break;
     default:
         break;
