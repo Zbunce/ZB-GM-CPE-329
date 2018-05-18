@@ -91,3 +91,13 @@ void clearScreen_ANSI()
     sendByte_UART(A_2);
     sendByte_UART(A_J);
 }
+
+void hideCurs_ANSI()
+{
+    sendByte_UART(A_ESC);
+    sendByte_UART(A_LBRKT);
+    sendByte_UART(A_QUEST);
+    sendByte_UART(A_2);
+    sendByte_UART(A_5);
+    sendByte_UART(A_l);
+}

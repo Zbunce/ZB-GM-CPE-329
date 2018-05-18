@@ -78,6 +78,8 @@
 #define A_UNDSC 0x5F
 #define A_ACCNT 0x60
 
+#define A_l     0x6C
+
 #define A_LCRLY 0x7B
 #define A_SSLSH 0x7C
 #define A_RCRLY 0x7D
@@ -91,6 +93,7 @@ void moveCursDown_ANSI(uint8_t);
 void moveCursLeft_ANSI(uint8_t);
 void moveCursRight_ANSI(uint8_t);
 void moveCursRC_ANSI(uint8_t, uint8_t);
+void hideCurs_ANSI();
 void cursPhoneHome_ANSI();
 void clearLineRight_ANSI();
 void clearLineLeft_ANSI();

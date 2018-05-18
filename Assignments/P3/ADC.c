@@ -1,5 +1,5 @@
 /*
- * UART.c
+ * ADC.c
  * Encapsulates ADC management
  * getIntFlag_ADC, clrIntFlag_ADC, calcVolt_ADC, and sendVolt_ADC intended for external use
  * ADC_INIT must be run prior to the use of this library
@@ -59,27 +59,27 @@ int calcVolt_ADC(int extAN)
 
     //Calibrates the ADC depending on the voltage level
     //Calibration values found iteratively
-    if (extAN < 2500) {          //0V - 0.5V calibration
-        anCal = extAN + 30;
-    }
-    else if (extAN < 5000) {     //0.5V - 1V calibration
-        anCal = extAN + 50;
-    }
-    else if (extAN < 7500) {    //1V - 1.5V calibration
-        anCal = extAN + 75;
-    }
-    else if (extAN < 10000) {    //1.5V - 2V calibration
-        anCal = extAN + 90;
-    }
-    else if (extAN < 10000) {    //2V - 2.5V calibration
-        anCal = extAN + 100;
-    }
-    else if (extAN < 15000) {    //2.5V - 3V calibration
-        anCal = extAN + 100;
-    }
-    else {
-        anCal = extAN + 125;
-    }
+//    if (extAN < 2500) {          //0V - 0.5V calibration
+//        anCal = extAN + 30;
+//    }
+//    else if (extAN < 5000) {     //0.5V - 1V calibration
+//        anCal = extAN + 50;
+//    }
+//    else if (extAN < 7500) {    //1V - 1.5V calibration
+//        anCal = extAN + 75;
+//    }
+//    else if (extAN < 10000) {    //1.5V - 2V calibration
+//        anCal = extAN + 90;
+//    }
+//    else if (extAN < 10000) {    //2V - 2.5V calibration
+//        anCal = extAN + 100;
+//    }
+//    else if (extAN < 15000) {    //2.5V - 3V calibration
+//        anCal = extAN + 100;
+//    }
+//    else {
+//        anCal = extAN + 125;
+//    }
 
     //Calculates voltage digits separately utilizing integer rounding
     int ones    = (anCal * VRef) / (RES_14_MAX * 10);

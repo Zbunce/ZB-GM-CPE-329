@@ -15,7 +15,7 @@
 //Run the program off globals, we'll encapsulate later. Way easier to manage than fxn passthrough
 static int msCount;
 static int freqTime;
-static int periodCount;
+static int periodCount = 0;
 static int msCount2;
 
 //All measurements 4 digit HCD
@@ -24,7 +24,8 @@ static int DCVoltage = 0;   //DC/True RMS
 static int frequency = 0;   //Frequency
 static int DCOffset  = 0;   //DC Offset
 static int AC_Flag = 0;     //High if AC detected
-static int vSample[100];     //Samples
+const int sampNum = 10000;
+static int vSample[sampNum];     //Samples
 
 volatile uint16_t captureValue[2] = {0,0};
 volatile uint16_t captureFlag = 0;
@@ -45,35 +46,38 @@ void main(void)
 
     int CLK = 240;
     int z = 0;
+    __disable_irq();
     set_DCO(CLK);
     ADC_INIT();
+    TIMER_INIT();
     UART_INIT(CLK, 115200);
     DISP_INIT();
-    TIMER_INIT();
+    __enable_irq();
 
     AC_Flag = 1;
 
     while(1) {
 //        AC_Flag = getACFlag_DMM();
         measPktoPk_DMM();
+        measDCV_DMM();
 
         if (AC_Flag == 1) {
+            DCOffset = DCVoltage;
             measACV_DMM();
             measFreq_DMM();
         }
         else {
-            measDCV_DMM();
             ACVoltage = 0;
             frequency = 0;
             DCOffset = 0;
         }
-        if (z == 10) {
+        if (z == 20) {
             z = 0;
             DISP_INIT();
         }
         z++;
         updateDisp_DMM();
-        //delay_ms(1, CLK);
+        delay_ms(100, CLK);
 
 //        if (DCVoltage == 0x3300) {
 //            DCVoltage = 0;
@@ -92,16 +96,32 @@ void main(void)
 void TIMER_INIT()
 {
     //Schmitt input setup
-    P5->DIR = ~(uint8_t) BIT1;
-    P5->OUT = BIT1;
-    P5->SEL0 = 0;
-    P5->SEL1 = 0;
-    P5->IES = BIT0;                         // Interrupt on high-to-low transition
-    P5->IFG = 0;                            // Clear all P1 interrupt flags
-    P5->IE = BIT1;                          // Enable interrupt for P1.1
+//    P5->DIR  &= ~BIT1;
+//    P5->OUT  |=  BIT1;
+//    P5->SEL0 &= ~BIT1;
+//    P5->SEL1 &= ~BIT1;
+//    P5->IES  &= ~BIT1;                         // Interrupt on low-to-high transition
+//    P5->IFG  &= ~BIT1;                         // Clear all P1 interrupt flags
+//    P5->IE   |=  BIT1;                          // Enable interrupt for P1.1
+//
+//    // Enable Port 5 interrupt on the NVIC
+//    NVIC->ISER[1] = 1 << ((PORT5_IRQn) & 31);
+//
+//    // Configure Port J
+//    PJ->DIR |= (BIT0| BIT1 | BIT2 | BIT3);
+//    PJ->OUT &= ~(BIT0 | BIT1 | BIT2 | BIT3);
 
-    // Enable Port 5 interrupt on the NVIC
-    NVIC->ISER[1] = 1 << ((PORT5_IRQn) & 31);
+    P2->DIR &= 0x00;
+    P2->OUT = BIT4;
+    P2->REN = BIT4;                // Enable pull-up resistor (P1.1 output high)
+    P2->SEL0 = 0;
+    P2->SEL1 = 0;
+    P2->IES = BIT4;                       // Interrupt on high-to-low transition
+    P2->IFG = 0;                            // Clear all P1 interrupt flags
+    P2->IE = BIT4;                          // Enable interrupt for P1.1
+
+    // Enable Port 1 interrupt on the NVIC
+    NVIC->ISER[1] = 1 << ((PORT2_IRQn) & 31);
 
     //TIMER_A0 setup
     TIMER_A0->CCTL[0] = TIMER_A_CCTLN_CCIE;     //Enables TACCR0 interrupt
@@ -127,13 +147,14 @@ void measDCV_DMM()
     int totalVoltVal =0;
     int i;
 
-    for(i = 0; i < 100; i++)
+    __disable_irq();
+    for(i = 0; i < sampNum; i++)
     {
         sampleTotal += vSample[i];
     }
-    averageSample = sampleTotal/100; //average adc dc voltage number
+    averageSample = sampleTotal/sampNum; //average adc dc voltage number
     DCVoltage = calcVolt_ADC(averageSample);
-
+    __enable_irq();
 }
 
 /* Spec:
@@ -153,16 +174,19 @@ void measACV_DMM()
 //Subprocess of measACV
 void measTRMS_DMM()
 {
-    int squareTotal;
+    double squareTotal;
+    int ADCNum;
     int i;
 
-    for(i=0; i<100; i++)
+    __disable_irq();
+    for(i = 0; i < sampNum; i++)
     {
         squareTotal += (vSample[i] * vSample[i]);
     }
 
-    DCVoltage = sqrt( (squareTotal/100) );
-
+    ADCNum = sqrt(squareTotal / sampNum);
+    DCVoltage = calcVolt_ADC(ADCNum);
+    __enable_irq();
 }
 
 //Subprocess of measACV
@@ -173,7 +197,8 @@ void measPktoPk_DMM()
     int bottomVal = (vSample[0])-1;
     int pkpk;
 
-    for(i = 0; i < 100; i++)
+    __disable_irq();
+    for(i = 0; i < sampNum; i++)
     {
         if(vSample[i] > topVal)
         {
@@ -187,7 +212,7 @@ void measPktoPk_DMM()
 
     pkpk = topVal - bottomVal;
 
-    if (pkpk > 2500 )
+    if (pkpk > 2482 )
     {
         AC_Flag = 1;
     }
@@ -197,10 +222,8 @@ void measPktoPk_DMM()
     }
 
     ACVoltage = calcVolt_ADC(pkpk);
+    __enable_irq();
 }
-
-
-
 
 /* Spec:
  * 1-1000Hz range
@@ -210,34 +233,10 @@ void measPktoPk_DMM()
  */
 void measFreq_DMM()
 {
-    int edge1Time = 0;
-    int edge2Time = 0;
-    int time = 0;
 
-    //keeps track of which falling rising edge were on
-    //if its on the first rising edge it stores the msCount value
-    //if its the second rising edge then it stores that msCount values into a sepreate variable
-    //then it subtracts the two msCounts to get the time between the rising edges
-    //with that it then calculates the frequency
-    if (periodCount == 1)
-    {
-        edge1Time = msCount2;
-    }
-    else if(periodCount == 2)
-    {
-        edge2Time = msCount2;
-        time = edge2Time - edge1Time;
-        periodCount = 0;
-    }
-
-    frequency = 10000000 / time;
 }
 
-/* Port5 ISR */
-void PORT5_IRQHandler(void)
-{
-    periodCount++;
-}
+
 
 
 /* Spec:
@@ -264,6 +263,9 @@ void updateDisp_DMM()
     uint8_t tenths;
     uint8_t hunths;
     uint8_t towths;
+
+    __disable_irq();
+    hideCurs_ANSI();
 
     if (DCVoltage < 0x0300) {
         meter = 1;
@@ -308,7 +310,7 @@ void updateDisp_DMM()
     if (AC_Flag == 1) {
         cursPhoneHome_ANSI();
         moveCursDown_ANSI(A_9);
-        moveCursDown_ANSI(A_8);
+        moveCursDown_ANSI(A_6);
         moveCursRight_ANSI(A_9);
         moveCursRight_ANSI(A_9);
         moveCursRight_ANSI(A_9);
@@ -327,7 +329,7 @@ void updateDisp_DMM()
 
         //True RMS
         cursPhoneHome_ANSI();
-        moveCursDown_ANSI(A_5);
+        moveCursDown_ANSI(A_4);
         moveCursRight_ANSI(A_9);
         moveCursRight_ANSI(A_9);
         moveCursRight_ANSI(A_8);
@@ -344,7 +346,7 @@ void updateDisp_DMM()
 
         //Peak to Peak
         cursPhoneHome_ANSI();
-        moveCursDown_ANSI(A_6);
+        moveCursDown_ANSI(A_5);
         moveCursRight_ANSI(A_9);
         moveCursRight_ANSI(A_9);
         moveCursRight_ANSI(A_8);
@@ -361,7 +363,7 @@ void updateDisp_DMM()
 
         //DC Offset
         cursPhoneHome_ANSI();
-        moveCursDown_ANSI(A_7);
+        moveCursDown_ANSI(A_6);
         moveCursRight_ANSI(A_9);
         moveCursRight_ANSI(A_9);
         moveCursRight_ANSI(A_8);
@@ -378,17 +380,18 @@ void updateDisp_DMM()
 
         //Frequency
         cursPhoneHome_ANSI();
-        moveCursDown_ANSI(A_9);
+        moveCursDown_ANSI(A_8);
         moveCursRight_ANSI(A_9);
         moveCursRight_ANSI(A_9);
-        ones =   ((frequency >> 12)& 0x0F) | 0x30;  //Totally not ones place but go with it
-        tenths = ((frequency >> 8) & 0x0F) | 0x30;
-        hunths = ((frequency >> 4) & 0x0F) | 0x30;
-        towths = (frequency & 0x0F) | 0x30;
-        sendByte_UART(ones);
-        sendByte_UART(tenths);
-        sendByte_UART(hunths);
+        towths = (frequency / 1000) | 0x30;
+        hunths = (frequency / 100 - towths*10) | 0x30;
+        tenths = (frequency / 10 - towths*100 - hunths*10) | 0x30;
+        ones   = (frequency - towths*1000 - hunths*100 - tenths*10) | 0x30;  //Totally not ones place but go with it
+
         sendByte_UART(towths);
+        sendByte_UART(hunths);
+        sendByte_UART(tenths);
+        sendByte_UART(ones);
     }
     else {
         cursPhoneHome_ANSI();
@@ -450,6 +453,7 @@ void updateDisp_DMM()
         moveCursRight_ANSI(A_8);
         sendString_UART("   0");
     }
+    __enable_irq();
 }
 
 
@@ -457,9 +461,8 @@ void updateDisp_DMM()
 void DISP_INIT()
 {
     int i;
-//    uint8_t col;
-//    uint8_t row;
     clearScreen_ANSI();
+    hideCurs_ANSI();
     cursPhoneHome_ANSI();
 
     moveCursRight_ANSI(A_2);
@@ -580,16 +583,13 @@ void TA0_0_IRQHandler(void)
     TIMER_A0->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG;  //Clears interrupt flag
     TIMER_A0->CCR[0] += 240;
 
-    int flag = getIntFlag_ADC();
-    if(flag) {
-        vSample[msCount] = getAnData_ADC();
-    }
+    vSample[msCount] = getAnData_ADC();
     clrIntFlag_ADC();
 
     msCount2++;
 
     switch(msCount) {
-    case(99):
+    case(sampNum - 1):
         msCount = 0;
         break;
     default:
@@ -597,4 +597,43 @@ void TA0_0_IRQHandler(void)
         break;
     }
 
+}
+
+/* Port5 ISR */
+void PORT2_IRQHandler(void)
+{
+    if(P2->IFG & BIT4) {
+//    if(P5->IFG & BIT1) {
+    periodCount++;
+//    }
+
+    static int edge1Time = 0;
+    static int edge2Time = 0;
+    int time = 0;
+
+    //keeps track of which falling rising edge were on
+    //if its on the first rising edge it stores the msCount value
+    //if its the second rising edge then it stores that msCount values into a sepreate variable
+    //then it subtracts the two msCounts to get the time between the rising edges
+    //with that it then calculates the frequency
+//    __disable_irq();
+    if (periodCount == 1)
+    {
+        edge1Time = msCount2;
+    }
+    else if (periodCount == 2)
+    {
+        edge2Time = msCount2;
+        time = edge2Time - edge1Time;
+        edge2Time = 0;
+        edge1Time = 0;
+        msCount2 = 0;
+        periodCount = 0;
+    }
+
+    frequency = 10000000 / time;
+//    __enable_irq();
+    }
+
+    P2->IFG &= ~BIT4;
 }
