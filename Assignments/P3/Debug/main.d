@@ -26,6 +26,7 @@ main.obj: ../delays.h
 main.obj: ../ADC.h
 main.obj: ../ANSI.h
 main.obj: ../UART.h
+main.obj: ../DMM.h
 main.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h
 
 ../main.c: 
@@ -54,4 +55,5 @@ C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/machine/_limits.h:
 ../ADC.h: 
 ../ANSI.h: 
 ../UART.h: 
+../DMM.h: 
 C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h: 

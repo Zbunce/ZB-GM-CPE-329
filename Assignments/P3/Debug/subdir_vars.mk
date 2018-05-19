@@ -11,6 +11,7 @@ CMD_SRCS += \
 C_SRCS += \
 ../ADC.c \
 ../ANSI.c \
+../DMM.c \
 ../UART.c \
 ../delays.c \
 ../main.c \
@@ -21,6 +22,7 @@ C_SRCS += \
 C_DEPS += \
 ./ADC.d \
 ./ANSI.d \
+./DMM.d \
 ./UART.d \
 ./delays.d \
 ./main.d \
@@ -31,6 +33,7 @@ C_DEPS += \
 OBJS += \
 ./ADC.obj \
 ./ANSI.obj \
+./DMM.obj \
 ./UART.obj \
 ./delays.obj \
 ./main.obj \
@@ -41,6 +44,7 @@ OBJS += \
 OBJS__QUOTED += \
 "ADC.obj" \
 "ANSI.obj" \
+"DMM.obj" \
 "UART.obj" \
 "delays.obj" \
 "main.obj" \
@@ -51,6 +55,7 @@ OBJS__QUOTED += \
 C_DEPS__QUOTED += \
 "ADC.d" \
 "ANSI.d" \
+"DMM.d" \
 "UART.d" \
 "delays.d" \
 "main.d" \
@@ -61,6 +66,7 @@ C_DEPS__QUOTED += \
 C_SRCS__QUOTED += \
 "../ADC.c" \
 "../ANSI.c" \
+"../DMM.c" \
 "../UART.c" \
 "../delays.c" \
 "../main.c" \
