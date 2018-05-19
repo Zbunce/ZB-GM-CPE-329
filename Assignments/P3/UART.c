@@ -1,9 +1,8 @@
 /*
  * UART.c
  * Encapsulates UART communication
- * getIntFlag, clrIntFlag, getRXByte, and sendByte_UART intended for external use
+ * getIntFlag, clrIntFlag, getRXByte, sendByte_UART, and sendString_UART intended for external use
  * UART_INIT must be run prior to the use of this library
- * Assumes 115200 baud used
  *
  * Date: May 11, 2018
  * Author: Zach Bunce, Garrett Maxon
@@ -17,21 +16,25 @@
 static int RX_Val = 0;
 static int UART_FLG = 0;
 
+//Returns RX indicator flag
 int getIntFlag_UART()
 {
     return UART_FLG;
 }
 
+//Clears RX indicator flag
 void clrIntFlag_UART()
 {
     UART_FLG = 0;
 }
 
+//Returns RX data received
 char getRXByte()
 {
     return RX_Val;
 }
 
+//Initializes UART communications
 void UART_INIT(int CLK, int baud)
 {
     //Initializes UART comms
@@ -39,6 +42,7 @@ void UART_INIT(int CLK, int baud)
     EUSCI_A0 -> CTLW0  =  EUSCI_A_CTLW0_SWRST |      //Reset again
                           EUSCI_A_CTLW0_SSEL__SMCLK; //Sets UART to use SMCLK
 
+    //Calculates register settings based on baud rate and clock speed used
     float N;
     float N1;
     float N1_Frac;
@@ -180,12 +184,14 @@ void UART_INIT(int CLK, int baud)
     P1 -> SEL0 |= BIT2 | BIT3;                  //Initializes RX & TX
 }
 
+//Sends the TX byte
 void sendByte_UART(uint8_t TX_Data)
 {
     while(!(EUSCI_A0 -> IFG & EUSCI_A_IFG_TXIFG));  //Waits for TX flag to clear
     EUSCI_A0 -> TXBUF = TX_Data;    //Drops data into TX buffer
 }
 
+//Sends a string of ASCII characters sequentially
 void sendString_UART(uint8_t word[])
 {
     uint8_t i;

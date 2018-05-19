@@ -3141,3 +3141,192 @@ Caused by: org.json.JSONException: Module Closed
 !ENTRY com.ti.ccstudio.debug 1 0 2018-05-18 01:58:32.387
 !MESSAGE DS_ERROR: CORTEX_M4_0: Failed to remove the debug state from the target before disconnecting.  There may still be breakpoint op-codes embedded in program memory.  It is recommended that you reset the emulator before you connect and reload your program before you continue debugging
 
+
+!ENTRY com.ti.ccstudio.debug 4 0 2018-05-18 10:25:45.899
+!MESSAGE An internal error was logged by 'com.ti.ccstudio.debug'.
+!STACK 0
+java.util.concurrent.ExecutionException: org.json.JSONException: Module Closed
+	at java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:357)
+	at java.util.concurrent.CompletableFuture.get(CompletableFuture.java:1895)
+	at com.ti.ccstudio.debug.service.ApplicationService.getConnectedDebugProbes(ApplicationService.java:292)
+	at com.ti.ccstudio.debug.service.ApplicationService.detectXDS110ConnectedProbes(ApplicationService.java:347)
+	at com.ti.ccstudio.debug.service.ApplicationService.initDebugger(ApplicationService.java:409)
+	at com.ti.ccstudio.debug.service.ApplicationService.access$0(ApplicationService.java:399)
+	at com.ti.ccstudio.debug.service.ApplicationService$ThreadContextCache.retrieve(ApplicationService.java:136)
+	at com.ti.ccstudio.debug.dsf.extensions.concurrent.DataCache.wait(DataCache.java:59)
+	at com.ti.ccstudio.debug.service.ApplicationService.getCpuBeingDebugged(ApplicationService.java:1040)
+	at com.ti.ccstudio.debug.launch.CCSLaunchDelegate$2.execute(CCSLaunchDelegate.java:131)
+	at org.eclipse.cdt.dsf.concurrent.Query.run(Query.java:177)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:180)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:293)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: org.json.JSONException: Module Closed
+	at com.ti.cloudagent.communication.JSONInterface.call(JSONInterface.java:54)
+	at com.ti.cloudagent.Agent.createModule(Agent.java:171)
+	at com.ti.cloudagent.Agent.lambda$createSpecificModule$4(Agent.java:96)
+	at java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:822)
+	at java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:834)
+	at java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2155)
+	at com.ti.cloudagent.Agent.createSpecificModule(Agent.java:87)
+	at com.ti.cloudagent.Agent.createDeviceDetector(Agent.java:76)
+	... 16 more
+
+!ENTRY com.ti.ccstudio.debug 4 0 2018-05-18 10:27:49.841
+!MESSAGE An internal error was logged by 'com.ti.ccstudio.debug'.
+!STACK 0
+java.util.concurrent.ExecutionException: org.json.JSONException: Module Closed
+	at java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:357)
+	at java.util.concurrent.CompletableFuture.get(CompletableFuture.java:1895)
+	at com.ti.ccstudio.debug.service.ApplicationService.getConnectedDebugProbes(ApplicationService.java:292)
+	at com.ti.ccstudio.debug.service.ApplicationService.detectXDS110ConnectedProbes(ApplicationService.java:347)
+	at com.ti.ccstudio.debug.service.ApplicationService.initDebugger(ApplicationService.java:409)
+	at com.ti.ccstudio.debug.service.ApplicationService.access$0(ApplicationService.java:399)
+	at com.ti.ccstudio.debug.service.ApplicationService$ThreadContextCache.retrieve(ApplicationService.java:136)
+	at com.ti.ccstudio.debug.dsf.extensions.concurrent.DataCache.wait(DataCache.java:59)
+	at com.ti.ccstudio.debug.service.ApplicationService.getCpuBeingDebugged(ApplicationService.java:1040)
+	at com.ti.ccstudio.debug.launch.CCSLaunchDelegate$2.execute(CCSLaunchDelegate.java:131)
+	at org.eclipse.cdt.dsf.concurrent.Query.run(Query.java:177)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:180)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:293)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: org.json.JSONException: Module Closed
+	at com.ti.cloudagent.communication.JSONInterface.call(JSONInterface.java:54)
+	at com.ti.cloudagent.Agent.createModule(Agent.java:171)
+	at com.ti.cloudagent.Agent.lambda$createSpecificModule$4(Agent.java:96)
+	at java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:822)
+	at java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:834)
+	at java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2155)
+	at com.ti.cloudagent.Agent.createSpecificModule(Agent.java:87)
+	at com.ti.cloudagent.Agent.createDeviceDetector(Agent.java:76)
+	... 16 more
+
+!ENTRY com.ti.ccstudio.debug 4 0 2018-05-18 10:28:29.619
+!MESSAGE An internal error was logged by 'com.ti.ccstudio.debug'.
+!STACK 0
+java.util.concurrent.ExecutionException: org.json.JSONException: Module Closed
+	at java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:357)
+	at java.util.concurrent.CompletableFuture.get(CompletableFuture.java:1895)
+	at com.ti.ccstudio.debug.service.ApplicationService.getConnectedDebugProbes(ApplicationService.java:292)
+	at com.ti.ccstudio.debug.service.ApplicationService.detectXDS110ConnectedProbes(ApplicationService.java:347)
+	at com.ti.ccstudio.debug.service.ApplicationService.initDebugger(ApplicationService.java:409)
+	at com.ti.ccstudio.debug.service.ApplicationService.access$0(ApplicationService.java:399)
+	at com.ti.ccstudio.debug.service.ApplicationService$ThreadContextCache.retrieve(ApplicationService.java:136)
+	at com.ti.ccstudio.debug.dsf.extensions.concurrent.DataCache.wait(DataCache.java:59)
+	at com.ti.ccstudio.debug.service.ApplicationService.getCpuBeingDebugged(ApplicationService.java:1040)
+	at com.ti.ccstudio.debug.launch.CCSLaunchDelegate$2.execute(CCSLaunchDelegate.java:131)
+	at org.eclipse.cdt.dsf.concurrent.Query.run(Query.java:177)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:180)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:293)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: org.json.JSONException: Module Closed
+	at com.ti.cloudagent.communication.JSONInterface.call(JSONInterface.java:54)
+	at com.ti.cloudagent.Agent.createModule(Agent.java:171)
+	at com.ti.cloudagent.Agent.lambda$createSpecificModule$4(Agent.java:96)
+	at java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:822)
+	at java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:834)
+	at java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2155)
+	at com.ti.cloudagent.Agent.createSpecificModule(Agent.java:87)
+	at com.ti.cloudagent.Agent.createDeviceDetector(Agent.java:76)
+	... 16 more
+
+!ENTRY com.ti.ccstudio.debug 4 0 2018-05-18 10:50:13.536
+!MESSAGE An internal error was logged by 'com.ti.ccstudio.debug'.
+!STACK 0
+java.util.concurrent.ExecutionException: org.json.JSONException: Module Closed
+	at java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:357)
+	at java.util.concurrent.CompletableFuture.get(CompletableFuture.java:1895)
+	at com.ti.ccstudio.debug.service.ApplicationService.getConnectedDebugProbes(ApplicationService.java:292)
+	at com.ti.ccstudio.debug.service.ApplicationService.detectXDS110ConnectedProbes(ApplicationService.java:347)
+	at com.ti.ccstudio.debug.service.ApplicationService.initDebugger(ApplicationService.java:409)
+	at com.ti.ccstudio.debug.service.ApplicationService.access$0(ApplicationService.java:399)
+	at com.ti.ccstudio.debug.service.ApplicationService$ThreadContextCache.retrieve(ApplicationService.java:136)
+	at com.ti.ccstudio.debug.dsf.extensions.concurrent.DataCache.wait(DataCache.java:59)
+	at com.ti.ccstudio.debug.service.ApplicationService.getCpuBeingDebugged(ApplicationService.java:1040)
+	at com.ti.ccstudio.debug.launch.CCSLaunchDelegate$2.execute(CCSLaunchDelegate.java:131)
+	at org.eclipse.cdt.dsf.concurrent.Query.run(Query.java:177)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:180)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:293)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: org.json.JSONException: Module Closed
+	at com.ti.cloudagent.communication.JSONInterface.call(JSONInterface.java:54)
+	at com.ti.cloudagent.Agent.createModule(Agent.java:171)
+	at com.ti.cloudagent.Agent.lambda$createSpecificModule$4(Agent.java:96)
+	at java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:822)
+	at java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:834)
+	at java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2155)
+	at com.ti.cloudagent.Agent.createSpecificModule(Agent.java:87)
+	at com.ti.cloudagent.Agent.createDeviceDetector(Agent.java:76)
+	... 16 more
+
+!ENTRY com.ti.ccstudio.debug 4 0 2018-05-18 10:51:29.046
+!MESSAGE An internal error was logged by 'com.ti.ccstudio.debug'.
+!STACK 0
+java.util.concurrent.ExecutionException: org.json.JSONException: Module Closed
+	at java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:357)
+	at java.util.concurrent.CompletableFuture.get(CompletableFuture.java:1895)
+	at com.ti.ccstudio.debug.service.ApplicationService.getConnectedDebugProbes(ApplicationService.java:292)
+	at com.ti.ccstudio.debug.service.ApplicationService.detectXDS110ConnectedProbes(ApplicationService.java:347)
+	at com.ti.ccstudio.debug.service.ApplicationService.initDebugger(ApplicationService.java:409)
+	at com.ti.ccstudio.debug.service.ApplicationService.access$0(ApplicationService.java:399)
+	at com.ti.ccstudio.debug.service.ApplicationService$ThreadContextCache.retrieve(ApplicationService.java:136)
+	at com.ti.ccstudio.debug.dsf.extensions.concurrent.DataCache.wait(DataCache.java:59)
+	at com.ti.ccstudio.debug.service.ApplicationService.getCpuBeingDebugged(ApplicationService.java:1040)
+	at com.ti.ccstudio.debug.launch.CCSLaunchDelegate$2.execute(CCSLaunchDelegate.java:131)
+	at org.eclipse.cdt.dsf.concurrent.Query.run(Query.java:177)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:180)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:293)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: org.json.JSONException: Module Closed
+	at com.ti.cloudagent.communication.JSONInterface.call(JSONInterface.java:54)
+	at com.ti.cloudagent.Agent.createModule(Agent.java:171)
+	at com.ti.cloudagent.Agent.lambda$createSpecificModule$4(Agent.java:96)
+	at java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:822)
+	at java.util.concurrent.CompletableFuture.uniHandleStage(CompletableFuture.java:834)
+	at java.util.concurrent.CompletableFuture.handle(CompletableFuture.java:2155)
+	at com.ti.cloudagent.Agent.createSpecificModule(Agent.java:87)
+	at com.ti.cloudagent.Agent.createDeviceDetector(Agent.java:76)
+	... 16 more
+
+!ENTRY com.ti.ccstudio.debug 1 0 2018-05-18 10:54:11.783
+!MESSAGE DS_ERROR: CS_DAP_0: Error: (Error -261 @ 0x0) Invalid response was received from the XDS110. (Emulation package 7.0.188.0) 
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2018-05-18 10:54:11.875
+!MESSAGE DS_ERROR: CS_DAP_0: Error: (Error -122 @ 0x0) A bad parameter value was detected within a function. It is likely a problem with `SC_ARGS' in SMG_call(). (Emulation package 7.0.188.0) 
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2018-05-18 10:54:12.282
+!MESSAGE DS_ERROR: CS_DAP_0: Unable to determine target status after 20 attempts
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2018-05-18 10:54:12.306
+!MESSAGE DS_ERROR: CS_DAP_0: Failed to remove the debug state from the target before disconnecting.  There may still be breakpoint op-codes embedded in program memory.  It is recommended that you reset the emulator before you connect and reload your program before you continue debugging
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2018-05-18 10:54:12.331
+!MESSAGE DS_ERROR: CORTEX_M4_0: JTAG Communication Error: (Error -261 @ 0x0) Invalid response was received from the XDS110. (Emulation package 7.0.188.0) 
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2018-05-18 10:54:12.396
+!MESSAGE DS_ERROR: CORTEX_M4_0: Failed to remove the debug state from the target before disconnecting.  There may still be breakpoint op-codes embedded in program memory.  It is recommended that you reset the emulator before you connect and reload your program before you continue debugging
+

@@ -1,7 +1,8 @@
 /*
  * ADC.c
  * Encapsulates ADC management
- * getIntFlag_ADC, clrIntFlag_ADC, calcVolt_ADC, and sendVolt_ADC intended for external use
+ * getIntFlag_ADC, clrIntFlag_ADC, calcVolt_ADC, sendVolt_ADC, and getAnData_ADC
+ * intended for external use
  * ADC_INIT must be run prior to the use of this library
  *
  * Date: May 11, 2018
@@ -31,16 +32,19 @@ void ADC_INIT()
     ADC14 -> CTL0 |= ADC14_CTL0_ENC | ADC14_CTL0_SC;
 }
 
+//Returns data ready flag
 int getIntFlag_ADC()
 {
     return dataReady_FLG;
 }
 
+//Returns the sampled data
 int getAnData_ADC()
 {
     return anIn;
 }
 
+//Clears data ready flag and enables next sample
 void clrIntFlag_ADC()
 {
     dataReady_FLG = 0;  //Clears sampled data ready flag
