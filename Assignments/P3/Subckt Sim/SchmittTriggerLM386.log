@@ -1,0 +1,22 @@
+Circuit: * C:\Users\sirmo\OneDrive\Cal Poly Files\9. Spring 2018\CPE 329\ZB-GM-CPE-329\Assignments\P3\Subckt Sim\SchmittTriggerLM386.asc
+
+WARNING: Less than two connections to node VSS.  This node is used by V3.
+Direct Newton iteration for .op point succeeded.
+
+Date: Thu May 17 22:38:27 2018
+Total elapsed time: 0.094 seconds.
+
+tnom = 27
+temp = 27
+method = modified trap
+totiter = 2113
+traniter = 2098
+tranpoints = 1050
+accept = 1050
+rejected = 0
+matrix size = 21
+fillins = 8
+solver = Normal
+Matrix Compiler1: 1.64 KB object code size  0.4/0.3/[0.2]
+Matrix Compiler2: 1.81 KB object code size  0.2/0.4/[0.2]
+

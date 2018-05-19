@@ -11,6 +11,7 @@ CMD_SRCS += \
 C_SRCS += \
 ../ADC.c \
 ../UART.c \
+../delays.c \
 ../main.c \
 ../set_DCO.c \
 ../startup_msp432p401r_ccs.c \
@@ -19,6 +20,7 @@ C_SRCS += \
 C_DEPS += \
 ./ADC.d \
 ./UART.d \
+./delays.d \
 ./main.d \
 ./set_DCO.d \
 ./startup_msp432p401r_ccs.d \
@@ -27,6 +29,7 @@ C_DEPS += \
 OBJS += \
 ./ADC.obj \
 ./UART.obj \
+./delays.obj \
 ./main.obj \
 ./set_DCO.obj \
 ./startup_msp432p401r_ccs.obj \
@@ -35,6 +38,7 @@ OBJS += \
 OBJS__QUOTED += \
 "ADC.obj" \
 "UART.obj" \
+"delays.obj" \
 "main.obj" \
 "set_DCO.obj" \
 "startup_msp432p401r_ccs.obj" \
@@ -43,6 +47,7 @@ OBJS__QUOTED += \
 C_DEPS__QUOTED += \
 "ADC.d" \
 "UART.d" \
+"delays.d" \
 "main.d" \
 "set_DCO.d" \
 "startup_msp432p401r_ccs.d" \
@@ -51,6 +56,7 @@ C_DEPS__QUOTED += \
 C_SRCS__QUOTED += \
 "../ADC.c" \
 "../UART.c" \
+"../delays.c" \
 "../main.c" \
 "../set_DCO.c" \
 "../startup_msp432p401r_ccs.c" \

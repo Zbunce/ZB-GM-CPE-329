@@ -19,6 +19,7 @@ main.obj: C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h
 main.obj: ../ADC.h
 main.obj: ../UART.h
 main.obj: ../set_DCO.h
+main.obj: ../delays.h
 
 ../main.c: 
 C:/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -39,3 +40,4 @@ C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h:
 ../ADC.h: 
 ../UART.h: 
 ../set_DCO.h: 
+../delays.h: 

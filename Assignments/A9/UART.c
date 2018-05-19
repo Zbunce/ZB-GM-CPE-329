@@ -9,7 +9,6 @@
  */
 
 #include "msp.h"
-//#include "keypad.h"
 #include <STDINT.h>
 
 static int RX_Val = 0;

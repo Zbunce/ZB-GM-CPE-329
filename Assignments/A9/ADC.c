@@ -54,27 +54,34 @@ int calcVolt_ADC()
 
     //Calibrates the ADC depending on the voltage level
     //Calibration values found iteratively
-    if (anIn < 4000) {
-        anCal = anIn + 25;
+    if (anIn < 2500) {          //0V - 0.5V calibration
+        anCal = anIn + 30;
     }
-    else if (anIn < 7000) {
+    else if (anIn < 5000) {     //0.5V - 1V calibration
         anCal = anIn + 50;
     }
-    else if (anIn < 11000) {
-        anCal = anIn + 70;
+    else if (anIn < 7500) {    //1V - 1.5V calibration
+        anCal = anIn + 75;
     }
-    else if (anIn < 13000) {
-        anCal = anIn + 125;
+    else if (anIn < 10000) {    //1.5V - 2V calibration
+        anCal = anIn + 90;
+    }
+    else if (anIn < 10000) {    //2V - 2.5V calibration
+        anCal = anIn + 100;
+    }
+    else if (anIn < 15000) {    //2.5V - 3V calibration
+        anCal = anIn + 100;
     }
     else {
-        anCal = anIn + 130;
+        anCal = anIn + 125;
     }
 
     //Calculates voltage digits separately utilizing integer rounding
     int ones    = (anCal * VRef) / (RES_14_MAX * 10);
     int tenths  = ((anCal * VRef) / RES_14_MAX) - (10 * ones);
     int hunths  = ((anCal * VRef * 10) / RES_14_MAX) - ((10 * tenths) + (100 * ones));
-    int voltage = ((ones & MASK_LOW_32) << 8) | ((tenths & MASK_LOW_32) << 4) | (hunths & MASK_LOW_32);
+    int voltage = ((ones & MASK_LOW_32) << 8) | ((tenths & MASK_LOW_32) << 4) |
+                   (hunths & MASK_LOW_32);
     return voltage; //Returns BCD voltage
 }
 
