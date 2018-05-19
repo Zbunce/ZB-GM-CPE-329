@@ -16,6 +16,7 @@
 int anIn;               //Holds sampled number
 int dataReady_FLG = 0;  //External sampled data ready flag
 
+//Configures ADC for reading analog voltage
 void ADC_INIT()
 {
     P5 -> SEL1 |= BIT4;   //Sets P5.4 as ADC voltage input
@@ -60,30 +61,6 @@ int calcVolt_ADC(int extAN)
     //N = (2^M)*(Vin+ - Vr-)/(Vr+ - Vr-), 1LSB = (Vr+ - Vr-)/(2^M)
     //Vin+ = N * Vr+/(2^M) - (1+N/(2^M))Vr-
     int anCal = extAN;
-
-    //Calibrates the ADC depending on the voltage level
-    //Calibration values found iteratively
-//    if (extAN < 2500) {          //0V - 0.5V calibration
-//        anCal = extAN + 30;
-//    }
-//    else if (extAN < 5000) {     //0.5V - 1V calibration
-//        anCal = extAN + 50;
-//    }
-//    else if (extAN < 7500) {    //1V - 1.5V calibration
-//        anCal = extAN + 75;
-//    }
-//    else if (extAN < 10000) {    //1.5V - 2V calibration
-//        anCal = extAN + 90;
-//    }
-//    else if (extAN < 10000) {    //2V - 2.5V calibration
-//        anCal = extAN + 100;
-//    }
-//    else if (extAN < 15000) {    //2.5V - 3V calibration
-//        anCal = extAN + 100;
-//    }
-//    else {
-//        anCal = extAN + 125;
-//    }
 
     //Calculates voltage digits separately utilizing integer rounding
     int ones    = (anCal * VRef) / (RES_14_MAX * 10);
