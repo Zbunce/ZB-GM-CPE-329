@@ -1,7 +1,7 @@
 /**
  * ANSI.h
  *
- * Header for running the ANSI escape code manipulations
+ * Header for running the ANSI escape code terminal manipulations
  *
  * Date: May 13, 2018
  * Authors: Zach Bunce, Garrett Maxon
