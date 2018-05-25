@@ -1,0 +1,22 @@
+Initialize Modules;
+while In ISR? {
+Calculate Peak to Peak Voltage;
+Calculate Average DC Voltage;
+if Is it AC Voltage?{
+  Calculate True-RMS Voltage;
+  Calculate Frequency;
+}
+else if Is it DC Voltage?{
+  Clear leftover AC measurements;
+}
+
+Update terminal;
+Pause for sampling;
+
+}
+
+if Has 10 us passed? {
+  Increment the timer;
+  Take new ADC sample;
+  Calculate frequency;
+}
