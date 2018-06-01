@@ -20,10 +20,19 @@ void main(void)
 	
 	int CLK = 120;
 	
+	P3->DIR = ~(uint8_t) BIT1;
+    P3->OUT = BIT1;
+    P3->REN = BIT1;                         // Enable pull-up resistor (P3.1 output high)
+	
+	P2->DIR = ~(uint8_t) BIT1;
+    P2->OUT = BIT1;
+    P2->REN = BIT1;   		
+
+	// Enable pull-up resistor (P2.1 output high)
 	//changes pages based on two buttons
 	//the first button goes to the next page and wraps back to the frist after the third page
 	//the second button goes to the previous page and wraps back to page three after the first page
-	if (button1 == 1)
+	if (button1 == 0)
 	{
 		pageNum ++;
 		if (pageNum > 3); 
@@ -31,7 +40,7 @@ void main(void)
 			pageNum = 1;
 		}
 	}
-	if (button2 == 1)
+	if (button2 == 0)
 	{
 		pageNum +-;
 		if (pageNum < 0 ); 
