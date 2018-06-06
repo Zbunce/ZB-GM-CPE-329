@@ -134,9 +134,37 @@ void writeDisp(int pageNum, int CLK)
     //three pages to display information on
     //Current Velocity & Acceleration (page 1) - Max Velocity & Acceleration(page 2) - 0-60 timer (page 3)
 	
+	char currVelStr[];
+	char currAccelStr[];
+	char maxVelStr[];
+	char maxAccelStr[];
+	char curr60TimeStr[];
+	char max60TimeStr[];
 	
+	snprintf( currVelStr, "CUR VEL: %d mph", currVel );
+	snprintf( currAccelStr, "CUR ACL: %.03f g", currAccel );
+	snprintf( maxVelStr, "MAX VEL: %d mph", maxVel );
+	snprintf( maxAccelStr, "MAX ACL: %.03f g", maxAccel );
+	snprintf( curr60TimeStr, "CUR 0-60: %.02f g", curr60Time );
+	snprintf( max60TimeStr, "MAX 0-60: %.02f g", max60Time );	
+	
+	if (pageNum == 1)
+    {
+        write_string_LCD(currVelStr, 0x00, CLK);
+        write_string_LCD(currAccelStr, 0x40, CLK);
+    }
+    else if (pageNum == 2)
+    {
+        write_string_LCD(maxVelStr, 0x00, CLK);
+        write_string_LCD(maxAccelStr, 0x40, CLK);
+    }
+    else if (pageNum == 3)
+    {
+        write_string_LCD(curr60TimeStr, 0x00, CLK);
+        write_string_LCD(max60TimeStr, 0x40, CLK);
+    }
 
-    if (pageNum == 1)
+    /* if (pageNum == 1)
     {
         write_string_LCD("CUR VEL: ", 0x00, CLK);
         write_string_LCD(currVel, 0x09, CLK);       //This wont work cause numbers != chars
@@ -162,7 +190,7 @@ void writeDisp(int pageNum, int CLK)
         write_string_LCD("MAX 0-60: ", 0x40, CLK);
         write_string_LCD(max60Time, 0x4A, CLK);
         write_string_LCD(" s", 0x4E, CLK);
-    }
+    } */
 }
 
 void measSixtyTime()
@@ -175,24 +203,28 @@ void measSixtyTime()
 
     //PROBALLY GOING TO OVERFLOW
     //A 20s 0-60 is only 20000ms. 32 bit ints are good for billions.
-
+	float msTime = 0.0;
+	float time = 0.0;
+	
     if(velocity <= 0)
     {
         msCount = 0;
     }
     else if (velocity >= 60)
     {
-        time = msCount;
+        msTime = msCount;
     }
 	
+	time = msTime/10000;
+	
 
-    //Calculates time digits separately utilizing integer rounding
+/*     //Calculates time digits separately utilizing integer rounding
 	int tens    =  time/(10000);
     int ones    = (time/10000) - (tens*10);
     int tenths  = (time/1000) - (ones*10);
     int hunths  = (time/100) - (tenths*10);
     int BCDtime = ((tens & MASK_LOW_32) << 12) | ((ones & MASK_LOW_32) << 8) |
-                  ((tenths & MASK_LOW_32) << 4) | (hunths & MASK_LOW_32);
+                  ((tenths & MASK_LOW_32) << 4) | (hunths & MASK_LOW_32); */
 }
 
 
@@ -229,14 +261,6 @@ void measYAccel()
 
 	
 	
-	int tens    =  xxx/(10000);
-    int ones    = (xxx/10000) - (tens*10);
-    int tenths  = (xxx/1000) - (ones*10);
-    int hunths  = (xxx/100) - (tenths*10);
-    int xxx = ((tens & MASK_LOW_32) << 12) | ((ones & MASK_LOW_32) << 8) |
-                  ((tenths & MASK_LOW_32) << 4) | (hunths & MASK_LOW_32);
-    //Convert inst. accel to BCD
-
 }
 
 void calcYVel()
@@ -250,13 +274,6 @@ void calcYVel()
     }
     curVel = areaSum; //CNT_MAGN orders shifted
 	
-	int tens    =  xxx/(10000);
-    int ones    = (xxx/10000) - (tens*10);
-    int tenths  = (xxx/1000) - (ones*10);
-    int hunths  = (xxx/100) - (tenths*10);
-    int xxx = ((tens & MASK_LOW_32) << 12) | ((ones & MASK_LOW_32) << 8) |
-                  ((tenths & MASK_LOW_32) << 4) | (hunths & MASK_LOW_32);
-    //Convert inst. accel to BCD
 }
 
 void TIMER_INIT()
