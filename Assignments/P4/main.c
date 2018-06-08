@@ -55,9 +55,10 @@ static uint32_t timeWatch[10] = {0,0,0,0,0,0,0,0,0,0};
 static int accelIndex = 0;
 
 static int curVel = 0;
+static int curAccel = 0;
 
-static int velMax = 0;
-static int aclMax = 0;
+static int maxVel = 0;
+static int maxAccel = 0;
 static int max60Time = 0;
 
 void main(void)
@@ -96,16 +97,22 @@ void main(void)
         accelStatus = readByte_I2C(STATUS_REG);
         YDR_Flag = accelStatus & BIT1;
 
-        if(YDR_FLAG) {
+        if(YDR_FLAG)
+		{
             measYAccel();
             calcYVel();
         }
 
-        if (curVel > velMax) {
-            velMax = curVel;
-
+        if (curVel > maxVel)
+		{
+            maxVel = curVel;
         }
-
+		
+		if (currAccel > maxAccel)
+		{
+            maxAccel = currAccel;
+        }
+		
         if (button1 == 0)
         {
             pageNum++;
@@ -134,14 +141,14 @@ void writeDisp(int pageNum, int CLK)
     //three pages to display information on
     //Current Velocity & Acceleration (page 1) - Max Velocity & Acceleration(page 2) - 0-60 timer (page 3)
 	
-	char currVelStr[];
+	char curVelStr[];
 	char currAccelStr[];
 	char maxVelStr[];
 	char maxAccelStr[];
 	char curr60TimeStr[];
 	char max60TimeStr[];
 	
-	snprintf( currVelStr, "CUR VEL: %d mph", currVel );
+	snprintf( curVelStr, "CUR VEL: %d mph", curVel );
 	snprintf( currAccelStr, "CUR ACL: %.03f g", currAccel );
 	snprintf( maxVelStr, "MAX VEL: %d mph", maxVel );
 	snprintf( maxAccelStr, "MAX ACL: %.03f g", maxAccel );
@@ -150,7 +157,7 @@ void writeDisp(int pageNum, int CLK)
 	
 	if (pageNum == 1)
     {
-        write_string_LCD(currVelStr, 0x00, CLK);
+        write_string_LCD(curVelStr, 0x00, CLK);
         write_string_LCD(currAccelStr, 0x40, CLK);
     }
     else if (pageNum == 2)
@@ -167,7 +174,7 @@ void writeDisp(int pageNum, int CLK)
     /* if (pageNum == 1)
     {
         write_string_LCD("CUR VEL: ", 0x00, CLK);
-        write_string_LCD(currVel, 0x09, CLK);       //This wont work cause numbers != chars
+        write_string_LCD(curVel, 0x09, CLK);       //This wont work cause numbers != chars
         write_string_LCD(" mph", 0x0C, CLK);
         write_string_LCD("CUR ACL: ", 0x40, CLK);
         write_string_LCD(currAccel, 0x49, CLK);
