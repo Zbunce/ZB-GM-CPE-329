@@ -14,7 +14,7 @@
 
 void I2C_INIT(uint8_t);
 void writeByte_I2C(uint8_t, uint8_t);
-uint8_t readByte_I2c(uint8_t);
+uint8_t readByte_I2C(uint8_t);
 
 void WriteEEPROM(uint16_t MemAddress, uint8_t MemByte);
 uint8_t ReadEEPROM(uint16_t MemAddress);

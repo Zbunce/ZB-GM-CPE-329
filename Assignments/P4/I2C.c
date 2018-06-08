@@ -8,6 +8,7 @@
 
 #include "msp.h"
 #include <stdint.h>
+#include "I2C.h"
 
 uint16_t TransmitFlag = 0;
 
@@ -43,10 +44,10 @@ void I2C_INIT(uint8_t devAddr)
 //Writes single byte to specified device register
 void writeByte_I2C(uint8_t regAddr, uint8_t data)
 {
-    //Change slave address
-    EUSCI_B0->CTLW0 |= EUSCI_A_CTLW0_SWRST;       // Software reset enabled
-    EUSCI_B0->I2CSA  = ACCEL_ADDR;             // Slave address
-    EUSCI_B0->CTLW0 &= ~EUSCI_A_CTLW0_SWRST;      // Release eUSCI from reset
+//    //Change slave address
+//    EUSCI_B0->CTLW0 |= EUSCI_A_CTLW0_SWRST;       // Software reset enabled
+//    EUSCI_B0->I2CSA  = ACCEL_ADDR;             // Slave address
+//    EUSCI_B0->CTLW0 &= ~EUSCI_A_CTLW0_SWRST;      // Release eUSCI from reset
 
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TR;          // Set transmit mode (write)
     EUSCI_B0->CTLW0 |= EUSCI_B_CTLW0_TXSTT;       // I2C start condition
@@ -68,9 +69,9 @@ void writeByte_I2C(uint8_t regAddr, uint8_t data)
 uint8_t readByte_I2C(uint8_t regAddr)
 {
     //Change slave address
-    EUSCI_B0->CTLW0 |= EUSCI_A_CTLW0_SWRST;       // Software reset enabled
-    EUSCI_B0->I2CSA  = ACCEL_ADDR;             // Slave address
-    EUSCI_B0->CTLW0 &= ~EUSCI_A_CTLW0_SWRST;      // Release eUSCI from reset
+//    EUSCI_B0->CTLW0 |= EUSCI_A_CTLW0_SWRST;       // Software reset enabled
+//    EUSCI_B0->I2CSA  = ACCEL_ADDR;             // Slave address
+//    EUSCI_B0->CTLW0 &= ~EUSCI_A_CTLW0_SWRST;      // Release eUSCI from reset
 
     uint8_t ReceiveByte;
 
