@@ -1,0 +1,31 @@
+Initialize EUSCI_B0 for I2C;
+while Send Start Bit{
+	Write I2C Slave Address;
+	Send Write Bit;
+	while Wait for ACK from Receiver;
+	Send Upper Byte of EEPROM Data Address;
+	while Wait for ACK from Receiver;
+	Send Lower Byte of EEPROM Data Address;
+	while Wait for ACK from Receiver;
+	Send Data Byte to EEPROM to be Stored;
+	while Wait for ACK from Receiver;
+	Send Stop Bit;
+	Wait 5 ms;
+}
+
+
+Send I2C Slave Address;
+Send Write Bit;
+while Wait for ACK from Receiver;
+	Send Upper Byte of EEPROM Data Address;
+while Wait for ACK from Receiver;
+	Send Lower Byte of EEPROM Data Address;
+while Wait for ACK from Receiver;
+	Send Start-Repeat Bit;
+	Send I2C Slave Address;
+while Wait for ACK from Receiver;
+	Read Data Stored at Transmitted EEPROM Address;
+while Wait for NACK from Receiver;
+	Send Stop Bit;
+
+Light Up LEDs Corresponding to Value Read

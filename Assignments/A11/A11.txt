@@ -1,0 +1,186 @@
+#include "msp.h"
+#include "keypad.h"
+#include "delay.h"
+
+void set_duty(void);
+
+int dutyhigh = 4500;
+int dutylow = 55500;
+char vals[2] = {0,9};
+char vals_n[2] = {0,9};
+int vals_count = 0;
+
+void main(void)
+{
+	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
+
+    TIMER_A0->CCTL[0] = TIMER_A_CCTLN_CCIE; // TACCR0 interrupt enabled
+    TIMER_A0->CCR[0] = 60000;
+    TIMER_A0->CTL = TIMER_A_CTL_SSEL__SMCLK | // SMCLK, continuous mode
+            TIMER_A_CTL_MC__CONTINUOUS;
+
+    keypad_init();
+
+    // Enable global interrupt
+    __enable_irq();
+
+    NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31);
+
+    P5 -> DIR |= BIT1;
+    P5 -> OUT &= ~BIT1;
+    char read_in = '~';
+    while(1)
+    {
+        read_in = '~';
+        while(read_in == '~')
+            read_in = keypad_press();
+        while(vals_count == 0 && !(read_in == '1' || read_in == '0'
+                || read_in == '*' || read_in == '#'))
+            read_in = keypad_press();
+        while(vals_count == 1 && vals[0] == '1' && read_in == '9')
+            read_in = keypad_press();
+        if(read_in == '*')
+        {
+            // go ccw 10 deg
+            if(vals_n[1] == '0' && vals_n[0] == '1')
+            {
+                vals_n[0] = '0';
+                vals_n[1] = '9';
+            }
+            else if(vals_n[1] != '0')
+                vals_n[1] -= 1;
+            set_duty();
+        }
+        else if(read_in == '#')
+        {
+            //go cw 10 deg
+            if(vals_n[1] == '9')
+            {
+                vals_n[0] = '1';
+                vals_n[1] = '0';
+            }
+            else if(!(vals_n[0] == '1' && vals_n[1] == '8'))
+                vals_n[1] += 1;
+            set_duty();
+        }
+        else
+        {
+            vals[vals_count] = read_in;
+            vals_count++;
+        }
+        if(vals_count >= 2)
+        {
+            vals_n[0] = vals[0];
+            vals_n[1] = vals[1];
+            set_duty();
+            vals_count = 0;
+        }
+        delay_ms(700, DCO3);
+    }
+}
+void set_duty(void)
+{
+    switch(vals_n[1])
+    {
+    case('0'):
+    {
+        if(vals_n[0] == '0')
+            dutyhigh = 3000;
+        else
+            dutyhigh = 6000;
+        break;
+    }
+    case('1'):
+    {
+        if(vals_n[0] == '0')
+            dutyhigh = 3300;
+        else
+            dutyhigh = 6300;
+        break;
+    }
+    case('2'):
+    {
+        if(vals_n[0] == '0')
+            dutyhigh = 3600;
+        else
+            dutyhigh = 6600;
+        break;
+    }
+    case('3'):
+    {
+        if(vals_n[0] == '0')
+            dutyhigh = 3900;
+        else
+            dutyhigh = 6900;
+        break;
+    }
+    case('4'):
+    {
+        if(vals_n[0] == '0')
+            dutyhigh = 4200;
+        else
+            dutyhigh = 7200;
+        break;
+    }
+    case('5'):
+    {
+        if(vals_n[0] == '0')
+            dutyhigh = 4500;
+        else
+            dutyhigh = 7500;
+        break;
+    }
+    case('6'):
+    {
+        if(vals_n[0] == '0')
+            dutyhigh = 4800;
+        else
+            dutyhigh = 7800;
+        break;
+    }
+    case('7'):
+    {
+        if(vals_n[0] == '0')
+            dutyhigh = 5100;
+        else
+            dutyhigh = 8100;
+        break;
+    }
+    case('8'):
+    {
+        if(vals_n[0] == '0')
+            dutyhigh = 5400;
+        else
+            dutyhigh = 8400;
+        break;
+    }
+    case('9'):
+    {
+        dutyhigh = 5700;
+        break;
+    }
+    default:
+    {
+        dutyhigh = dutyhigh;
+        break;
+    }
+    }
+    dutylow = 60000 - dutyhigh;
+}
+void TA0_0_IRQHandler(void)
+{
+    TIMER_A0->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG;
+    static int high = 1;
+    if(high)
+    {
+        P5 -> OUT |= BIT1;
+        TIMER_A0->CCR[0] += dutyhigh;
+        high = 0;
+    }
+    else
+    {
+        P5 -> OUT &= ~BIT1;
+        TIMER_A0->CCR[0] += dutylow;
+        high = 1;
+    }
+}
