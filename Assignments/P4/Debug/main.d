@@ -27,6 +27,7 @@ main.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h
 main.obj: ../set_DCO.h
 main.obj: ../delays.h
 main.obj: ../LCD.h
+main.obj: ../keypad.h
 main.obj: ../I2C.h
 
 ../main.c: 
@@ -56,4 +57,5 @@ C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.1.LTS/include/string.h:
 ../set_DCO.h: 
 ../delays.h: 
 ../LCD.h: 
+../keypad.h: 
 ../I2C.h: 

@@ -16,7 +16,6 @@ I2C.obj: C:/ti/ccsv8/ccs_base/arm/include/CMSIS/core_cm4.h
 I2C.obj: C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h
 I2C.obj: C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h
 I2C.obj: C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h
-I2C.obj: ../I2C.h
 
 ../I2C.c: 
 C:/ti/ccsv8/ccs_base/arm/include/msp.h: 
@@ -34,4 +33,3 @@ C:/ti/ccsv8/ccs_base/arm/include/CMSIS/core_cm4.h:
 C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_compiler.h: 
 C:/ti/ccsv8/ccs_base/arm/include/CMSIS/cmsis_ccs.h: 
 C:/ti/ccsv8/ccs_base/arm/include/system_msp432p401r.h: 
-../I2C.h: 
